@@ -1,2 +1,1 @@
-# APS360
-Pytorch labs
+# APS360 Project
