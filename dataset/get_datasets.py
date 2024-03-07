@@ -1,7 +1,7 @@
 """
 @brief Program to compile multiple datasets of printed music symbols
 
-Last updated: 03/06/24
+Last updated: 03/07/24
 """
 
 import os
@@ -11,7 +11,6 @@ import splitfolders
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
-from PIL import Image
 # Utilize the omrdatasettools library for processing AudiverisOmr dataset
 from omrdatasettools.AudiverisOmrImageGenerator import AudiverisOmrImageGenerator
 # Get the ignored and mapped classes for each dataset
