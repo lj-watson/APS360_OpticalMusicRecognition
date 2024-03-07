@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # Delete all contents in the directory
     print("Deleting directory contents... ", end="")
     delete_dir_contents(directory_path)
-    print("Done")
+    print("Done!")
 
     # Create directory to store unprocessed datasets
     opmr_pure = create_sub_directory(directory_path, "openomr_pure")
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     download_and_extract(prnt_pure, PRINTED_URL)
     download_and_extract(opmr_pure, OPENOMR_URL)
     download_and_extract(audi_pure, AUDIVERIS_URL)
-    print("Done")
+    print("Done!")
 
     # Extract the symbols from Audiveris using omrdatasettools
     audi_symbols_pure = create_sub_directory(directory_path, "audi_symbols_pure")
@@ -147,14 +147,14 @@ if __name__ == "__main__":
     process_dataset_classes(rbl2_pure, data_proc_path, ignored_classes["Rebelo2"], mapped_classes["Rebelo2"])
     process_dataset_classes(prnt_pure, data_proc_path, ignored_classes["Printed"], mapped_classes["Printed"])
     process_dataset_classes(audi_symbols_pure, data_proc_path, ignored_classes["Audiveris"], mapped_classes["Audiveris"])
-    print("Done")
+    print("Done!")
 
     # Split into testing, training, and validation subsets
     print("Splitting data... ", end="")
     split_path = os.path.join(directory_path, "split-dataset")
     # Split at a ratio of 80% training, 10% validation, and 10% testing
     splitfolders.ratio(data_proc_path, split_path, seed=2003, ratio=(0.8, 0.1, 0.1))
-    print("Done")
+    print("Done!")
 
     # Delete original folders
     print("Removing dummy folders... ", end="")
@@ -164,4 +164,4 @@ if __name__ == "__main__":
         for dir_name in dirs:
             if dir_name != "split-dataset":
                 shutil.rmtree(os.path.join(root, dir_name))
-    print("Done")
+    print("Done!")
