@@ -82,8 +82,11 @@ def process_dataset_classes(old_path, new_path, ignored, mapping):
         if _class in ignored:
             continue
         src = os.join(old_path, _class)
-        # If not, add to new directory
-        fixed_class = mapping[_class]
+        # If name needs to be mapped, map it
+        if mapping[_class]:
+            fixed_class = mapping[_class]
+        else:
+            fixed_class = _class
         # Make the directory if it doesn't exist yet
         target = os.path.join(new_path, fixed_class)
         if not os.path.exists(target):
