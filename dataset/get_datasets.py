@@ -37,11 +37,14 @@ def get_directory_path():
         if not directory_path or not os.path.isdir(directory_path):
             print("Invalid input, try again")
         else:
-            confirmation = input("The contents of the directory will be deleted. Proceed? (y/n) ").lower()
-            if confirmation == 'y':
-                return directory_path
-            else:
-                continue
+            while True:
+                confirmation = input("The contents of the directory will be deleted. Proceed? (y/n) ").lower()
+                if confirmation == 'y':
+                    return directory_path
+                elif confirmation == 'n':
+                    break
+                else:
+                    continue
         
 def create_sub_directory(parent, sub):
     try:
@@ -81,9 +84,9 @@ def process_dataset_classes(old_path, new_path, ignored, mapping):
         # Get rid of all ignored classes
         if _class in ignored:
             continue
-        src = os.join(old_path, _class)
+        src = os.path.join(old_path, _class)
         # If name needs to be mapped, map it
-        if mapping[_class]:
+        if _class in mapping:
             fixed_class = mapping[_class]
         else:
             fixed_class = _class
@@ -120,11 +123,11 @@ if __name__ == "__main__":
     prnt_pure = create_sub_directory(directory_path, "printed_pure")
     audi_pure = create_sub_directory(directory_path, "audivers_pure")
 
-    download_and_extract(REBELO1_URL, opmr_pure)
-    download_and_extract(REBELO2_URL, rbl1_pure)
-    download_and_extract(PRINTED_URL, rbl2_pure)
-    download_and_extract(OPENOMR_URL, prnt_pure)
-    download_and_extract(AUDIVERIS_URL, audi_pure)
+    download_and_extract(rbl1_pure, REBELO1_URL)
+    download_and_extract(rbl2_pure, REBELO2_URL)
+    download_and_extract(prnt_pure, PRINTED_URL)
+    download_and_extract(opmr_pure, OPENOMR_URL)
+    download_and_extract(audi_pure, AUDIVERIS_URL)
 
     # Extract the symbols from Audiveris using omrdatasettools
     audi_symbols_pure = create_sub_directory(directory_path, "audi_symbols_pure")
@@ -147,6 +150,8 @@ if __name__ == "__main__":
 
     # Delete original folders
     for root, dirs, files in os.walk(directory_path):
+        if "split-dataset" in dirs:
+            dirs.remove("split-dataset")
         for dir_name in dirs:
             if dir_name != "split-dataset":
-                os.rmdir(os.path.join(root, dir_name))
+                shutil.rmtree(os.path.join(root, dir_name))

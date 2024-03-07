@@ -91,7 +91,7 @@ ignored_classes = {
 
 mapped_classes = {
 
-    "OpenOMR_mapping": {
+    "OpenOMR": {
         "bass": "F-Clef",
         "demisemiquaver_line": "Beam",
         "flat": "Flat",
