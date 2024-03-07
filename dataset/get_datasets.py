@@ -151,7 +151,7 @@ if __name__ == "__main__":
     print("Done.")
 
     # Split into testing, training, and validation subsets
-    print("Splitting data... ", end="")
+    print("Splitting data... ")
     split_path = os.path.join(directory_path, "split-dataset")
     # Split at a ratio of 80% training, 10% validation, and 10% testing
     splitfolders.ratio(data_proc_path, split_path, seed=2003, ratio=(0.8, 0.1, 0.1))
