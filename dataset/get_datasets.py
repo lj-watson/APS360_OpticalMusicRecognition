@@ -101,12 +101,13 @@ def process_dataset_classes(old_path, new_path, ignored, mapping):
             if os.path.isfile(file_path):
                 shutil.copy(file_path, target)
 
-def resize(img_path, width, height):
-    if os.path.isfile(img_path) and img_path.lower().endswith(('.png')):
-        pure_img = Image.open(img_path).convert("RGB")
-        if pure_img != (height, width):
-            new_img = pure_img.resize((height, width), Image.LANCZOS)
-            new_img.save(img_path)
+def collect_filenames(directory):
+    filenames = []
+    # Walk through all the subfolders in directory and add name to list
+    for(root, dirs, files) in os.walk(directory):
+        for file in files:
+            filenames.append(file)
+    return filenames
 
 if __name__ == "__main__":
 
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     # Delete all contents in the directory
     print("Deleting directory contents... ", end="")
     delete_dir_contents(directory_path)
-    print("Done!")
+    print("Done.")
 
     # Create directory to store unprocessed datasets
     opmr_pure = create_sub_directory(directory_path, "openomr_pure")
@@ -131,7 +132,7 @@ if __name__ == "__main__":
     download_and_extract(prnt_pure, PRINTED_URL)
     download_and_extract(opmr_pure, OPENOMR_URL)
     download_and_extract(audi_pure, AUDIVERIS_URL)
-    print("Done!")
+    print("Done.")
 
     # Extract the symbols from Audiveris using omrdatasettools
     audi_symbols_pure = create_sub_directory(directory_path, "audi_symbols_pure")
@@ -147,14 +148,14 @@ if __name__ == "__main__":
     process_dataset_classes(rbl2_pure, data_proc_path, ignored_classes["Rebelo2"], mapped_classes["Rebelo2"])
     process_dataset_classes(prnt_pure, data_proc_path, ignored_classes["Printed"], mapped_classes["Printed"])
     process_dataset_classes(audi_symbols_pure, data_proc_path, ignored_classes["Audiveris"], mapped_classes["Audiveris"])
-    print("Done!")
+    print("Done.")
 
     # Split into testing, training, and validation subsets
     print("Splitting data... ", end="")
     split_path = os.path.join(directory_path, "split-dataset")
     # Split at a ratio of 80% training, 10% validation, and 10% testing
     splitfolders.ratio(data_proc_path, split_path, seed=2003, ratio=(0.8, 0.1, 0.1))
-    print("Done!")
+    print("Done.")
 
     # Delete original folders
     print("Removing dummy folders... ", end="")
@@ -164,4 +165,19 @@ if __name__ == "__main__":
         for dir_name in dirs:
             if dir_name != "split-dataset":
                 shutil.rmtree(os.path.join(root, dir_name))
-    print("Done!")
+    print("Done.")
+
+    # Check how many files in each split
+    test_files = collect_filenames(os.path.join(split_path, "test"))
+    train_files = collect_filenames(os.path.join(split_path, "train"))
+    val_files = collect_filenames(os.path.join(split_path, "val"))
+
+    # Verify the quantity of each set
+    total_files = len(test_files) + len(train_files) + len(val_files)
+    print("Total files in dataset:", total_files)
+    print("Training files compromise", "{:.2%}".format(len(train_files)/total_files), 
+        "of the total dataset, with", len(train_files), "images")
+    print("Testing files compromise", "{:.2%}".format(len(test_files)/total_files), 
+        "of the total dataset, with", len(test_files), "images")
+    print("Validation files compromise", "{:.2%}".format(len(val_files)/total_files), 
+        "of the total dataset, with", len(val_files), "images")
