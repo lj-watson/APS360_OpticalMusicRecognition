@@ -1,0 +1,8 @@
+# Required libraries to be installed
+split-folders
+omrdatasettools
+torchvision
+tqdm
+pillow
+torch
+matplotlib
