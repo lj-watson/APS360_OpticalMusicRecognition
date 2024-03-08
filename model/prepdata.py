@@ -13,8 +13,8 @@ from PIL import Image
 from tqdm import tqdm
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-from keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing import image
+from keras_preprocessing.image import ImageDataGenerator
+from keras_preprocessing import image
 from PIL import Image
 
 # CONSTANTS
