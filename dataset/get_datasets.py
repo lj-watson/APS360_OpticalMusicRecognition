@@ -166,6 +166,8 @@ if __name__ == "__main__":
                 shutil.rmtree(os.path.join(root, dir_name))
     print("Done.")
 
+    print(f"Dataset is located in {split_path}.")
+
     # Check how many files in each split
     test_files = collect_filenames(os.path.join(split_path, "test"))
     train_files = collect_filenames(os.path.join(split_path, "train"))

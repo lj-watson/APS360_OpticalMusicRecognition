@@ -43,6 +43,7 @@ ignored_classes = {
     "Printed": [
         "2-2-Time", 
         "9-8-Time", 
+        "12-8-Time"
         "C-Clef",
         "Common-Time", 
         "Double-Flat", 
@@ -73,6 +74,7 @@ ignored_classes = {
         "7-4-Time", 
         "8-8-Time", 
         "9-8-Time", 
+        "12-8-Time"
         "Breve", 
         "C-Clef", 
         "Chord", 
