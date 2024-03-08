@@ -19,8 +19,8 @@ class CNN(nn.Module):
         # 2nd Convolutional layer
         self.conv2 = nn.Conv2d(16, 32, 3)
         # Fully connected network
-        self.fc1 = nn.Linear(54 * 54 * 32, 32)
-        self.fc2 = nn.Linear(32, 34)
+        self.fc1 = nn.Linear(54 * 54 * 32, 64)
+        self.fc2 = nn.Linear(64, 36)
 
     def forward(self, x):
         # Pass through convolutional and pooling layers
