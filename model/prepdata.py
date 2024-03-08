@@ -45,7 +45,7 @@ if __name__ == "__main__":
     dataset_path = get_directory_path()
 
     # Resize all images
-    for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images", unit=" images"):
+    for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images"):
         for file in files:
             resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
     '''
