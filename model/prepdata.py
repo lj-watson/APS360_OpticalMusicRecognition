@@ -174,7 +174,7 @@ if __name__ == "__main__":
                 k += 1
         std = np.sqrt(std / (k - 2))
 
-        print("Writing new values to file...", end="")
+        print(f"Writing mean {mean} and std {std} to file...", end="")
         meanstd_path = 'meanstd.json'
         try:
             with open(meanstd_path, 'r') as file:
