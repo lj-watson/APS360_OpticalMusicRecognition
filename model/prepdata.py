@@ -7,14 +7,23 @@ Last updated: 03/07/24
 import os
 import sys
 import json
+import random
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
- 
+from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing import image
+from PIL import Image
+
+# CONSTANTS
+VARIABILITY = 50
 SET_WIDTH = 224
 SET_HEIGHT = 224
+
+# Set a seed
+random.seed(10)
 
 # Get the directory of dataset
 def get_directory_path():
@@ -39,6 +48,72 @@ def resize(img_path, width, height):
             print(f"Error resizing image: {e}")
             sys.exit(1)
 
+def add_noise(img):
+    deviation = VARIABILITY * random.random()
+    noise = np.random.normal(0, deviation, img.shape)
+    img += noise
+    np.clip(img, 0, 255)
+    return img
+
+def data_augmentation(directory):
+
+    datagen = ImageDataGenerator(
+        preprocessing_function=add_noise
+        #rotation_range=15,
+        #width_shift_range=0.5,
+        #height_shift_range=0.5,
+        #shear_range=0.05,
+        #fill_mode='nearest',
+        #channel_shift_range=20,
+        #brightness_range=[0.8, 1.2]
+    )
+
+    subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
+
+    for subfolder in tqdm(subfolders):
+        items = os.listdir(subfolder)
+        item_count = len(items)
+        folder_path = os.path.join(directory, subfolder)
+
+        i = 0
+        for item in items:
+            rand = random.random()
+
+            if rand < 0.25:
+
+                img_path = os.path.join(folder_path, items[i])
+
+                curr_img = image.load_img(img_path)
+
+                img_list = [curr_img]
+                arr = image.img_to_array(curr_img)
+                arr = arr.reshape((1,) + arr.shape)
+
+                for k, batch in enumerate(datagen.flow(arr, batch_size=1)):
+                    new_img = image.array_to_img(batch[0])
+                    img_list.append(new_img)
+
+                    save_path = os.path.join(folder_path, "aug_{}_{}.png".format(item, k))
+                    new_img.save(save_path)
+
+                    if len(img_list) >= 4:
+                        break
+
+                #rows, cols = 2, 2
+                #fig, array = plt.subplots(rows, cols)
+
+                #for j in range(4):
+                    #array[j // cols, j % cols].imshow(img_list[j])
+
+                #plt.show()
+
+            else:
+                continue
+
+            i += 1
+            if (i > item_count - 1):
+                break
+
 if __name__ == "__main__":
 
     # Get the path to the dataset to train on
@@ -51,22 +126,24 @@ if __name__ == "__main__":
     
     while True:
         normalize_yn = input("Normalize data? (y/n) ").lower()
-        if normalize_yn != 'y' or normalize_yn != 'n':
-            continue
-        else:
+        if normalize_yn == 'y' or normalize_yn == 'n':
             break
+        else:
+            continue
 
     while True:
         augment_yn = input("Augment data? (y/n) ").lower()
-        if augment_yn != 'y' or augment_yn != 'n':
-            continue
-        else:
+        if augment_yn == 'y' or augment_yn == 'n':
             break
+        else:
+            continue
 
     if augment_yn == 'y':
-        
-        # augment dataset
-    
+        train_path = dataset_path + "/split-dataset/train"
+        print("Augmenting Data...")
+        data_augmentation(train_path)
+        print("Done!")
+            
     if normalize_yn == 'y':
         # Load the data into Pytorch datset, transform into tensor for model
         # Transform to tensors of normalized range using calculated mean and standard deviation
