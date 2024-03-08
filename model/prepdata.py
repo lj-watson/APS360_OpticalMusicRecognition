@@ -30,7 +30,7 @@ def resize(img_path, width, height):
     if os.path.isfile(img_path) and img_path.lower().endswith(('.png')):
         # Ensure file is black and white
         try:
-            pure_img = Image.open(img_path).convert("L")
+            pure_img = Image.open(img_path)
             pure_width, pure_height = pure_img.size
             if pure_width != width or pure_height != height:
                 new_img = pure_img.resize((height, width), Image.Resampling.LANCZOS)
