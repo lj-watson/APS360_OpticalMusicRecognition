@@ -16,7 +16,7 @@ from torch.utils.data.dataloader import DataLoader
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import torchvision
-from torchvision import ImageFolder
+from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from model import CNN
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
     dataset_path = get_directory_path()
 
-    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(data['mean'], data['std'])])
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((data['mean'],), (data['std'],))])
     train_dataset = ImageFolder(os.path.join(dataset_path, "train"), transform=transform)
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
     test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
