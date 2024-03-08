@@ -14,7 +14,7 @@ from zipfile import ZipFile
 # Utilize the omrdatasettools library for processing AudiverisOmr dataset
 from omrdatasettools.AudiverisOmrImageGenerator import AudiverisOmrImageGenerator
 # Get the ignored and mapped classes for each dataset
-from dataclasses import ignored_classes, mapped_classes
+from dataset_classes import ignored_classes, mapped_classes
 
 # Links to the datasets we will be downloading and processing, available in convenient zip files
 # in the OMR-Datasets collection
