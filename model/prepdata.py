@@ -30,7 +30,7 @@ def resize(img_path, width, height):
     if os.path.isfile(img_path) and img_path.lower().endswith(('.png')):
         # Ensure file is black and white
         try:
-            pure_img = Image.open(img_path).convert("1")
+            pure_img = Image.open(img_path).convert("L")
             pure_width, pure_height = pure_img.size
             if pure_width != width or pure_height != height:
                 new_img = pure_img.resize((height, width), Image.Resampling.LANCZOS)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images", unit=" images"):
         for file in files:
             resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
-
+    '''
     # Load the data into Pytorch datset, transform into tensor for model
     # Transform to tensors of normalized range using calculated mean and standard deviation
     dataset_unnormalized = ImageFolder(root=dataset_path, transform=transforms.ToTensor())
@@ -81,3 +81,4 @@ if __name__ == "__main__":
     with open(meanstd_path, 'w') as file:
         json.dump(data, file, indent=4)
     print("Done.")
+    '''
