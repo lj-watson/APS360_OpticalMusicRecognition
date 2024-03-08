@@ -125,24 +125,35 @@ if __name__ == "__main__":
             resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
     
     while True:
-        normalize_yn = input("Normalize data? (y/n) ").lower()
+        normalize_yn = input("Calculate dataset normalization? (y/n) ").lower()
         if normalize_yn == 'y' or normalize_yn == 'n':
             break
         else:
             continue
 
     while True:
-        augment_yn = input("Augment data? (y/n) ").lower()
-        if augment_yn == 'y' or augment_yn == 'n':
+        augment_yn = input("Augment/Delete augmented data? (y/delete/none) ").lower()
+        if augment_yn == 'y' or augment_yn == 'none' or augment_yn == 'delete':
             break
         else:
             continue
 
     if augment_yn == 'y':
-        train_path = dataset_path + "/split-dataset/train"
-        print("Augmenting Data...")
+        train_path = os.path.join(dataset_path, "train")
+        num_files = sum(len(files) for _, _, files in os.walk(train_path))
+        print(f"Number of training files is {num_files}. Augmenting data...")
         data_augmentation(train_path)
-        print("Done!")
+        print("Done.")
+        num_files = sum(len(files) for _, _, files in os.walk(train_path))
+        print(f"Number of training files is now {num_files}")
+    elif augment_yn == 'delete':
+        print("Deleting augmented data...")
+        for root, dirs, files in os.walk(dataset_path):
+            for file in files:
+                if file.startswith("aug"):
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)
+        print("Done.")
             
     if normalize_yn == 'y':
         # Load the data into Pytorch datset, transform into tensor for model

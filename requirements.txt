@@ -6,3 +6,5 @@ tqdm
 pillow
 torch
 matplotlib
+tensorflow
+keras
