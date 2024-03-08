@@ -137,23 +137,6 @@ if __name__ == "__main__":
             break
         else:
             continue
-
-    if augment_yn == 'y':
-        train_path = os.path.join(dataset_path, "train")
-        num_files = sum(len(files) for _, _, files in os.walk(train_path))
-        print(f"Number of training files is {num_files}. Augmenting data...")
-        data_augmentation(train_path)
-        print("Done.")
-        num_files = sum(len(files) for _, _, files in os.walk(train_path))
-        print(f"Number of training files is now {num_files}")
-    elif augment_yn == 'delete':
-        print("Deleting augmented data...")
-        for root, dirs, files in os.walk(dataset_path):
-            for file in files:
-                if file.startswith("aug"):
-                    file_path = os.path.join(root, file)
-                    os.remove(file_path)
-        print("Done.")
             
     if normalize_yn == 'y':
         # Load the data into Pytorch datset, transform into tensor for model
@@ -187,4 +170,21 @@ if __name__ == "__main__":
 
         with open(meanstd_path, 'w') as file:
             json.dump(data, file, indent=4)
+        print("Done.")
+
+    if augment_yn == 'y':
+        train_path = os.path.join(dataset_path, "train")
+        num_files = sum(len(files) for _, _, files in os.walk(train_path))
+        print(f"Number of training files is {num_files}. Augmenting data...")
+        data_augmentation(train_path)
+        print("Done.")
+        num_files = sum(len(files) for _, _, files in os.walk(train_path))
+        print(f"Number of training files is now {num_files}")
+    elif augment_yn == 'delete':
+        print("Deleting augmented data...")
+        for root, dirs, files in os.walk(dataset_path):
+            for file in files:
+                if file.startswith("aug"):
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)
         print("Done.")
