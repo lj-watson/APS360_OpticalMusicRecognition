@@ -154,6 +154,33 @@ if __name__ == "__main__":
     split_path = os.path.join(directory_path, "split-dataset")
     # Split at a ratio of 80% training, 10% validation, and 10% testing
     splitfolders.ratio(data_proc_path, split_path, seed=2003, ratio=(0.8, 0.1, 0.1))
+
+    # Check if there are 0 files in a class, if so move 1 over from training
+    for class_name in os.listdir(os.path.join(split_path, "val")):
+        class_dir = os.path.join(os.path.join(split_path, "val"), class_name)
+        if len(os.listdir(class_dir)) == 0:
+             train_class_path = os.path.join(os.path.join(split_path, "train"), class_name)
+             for file_name in os.listdir(train_class_path):
+                file_path = os.path.join(train_class_path, file_name)
+                if os.path.isfile(file_path):
+                    # Move the file to the empty class directory
+                    shutil.move(file_path, class_dir)
+                    if len(os.listdir(train_class_path)) == 0:
+                        print(f"Warning: no samples left in training class {class_name}")
+                    break
+    for class_name in os.listdir(os.path.join(split_path, "test")):
+        class_dir = os.path.join(os.path.join(split_path, "test"), class_name)
+        if len(os.listdir(class_dir)) == 0:
+             train_class_path = os.path.join(os.path.join(split_path, "train"), class_name)
+             for file_name in os.listdir(train_class_path):
+                file_path = os.path.join(train_class_path, file_name)
+                if os.path.isfile(file_path):
+                    # Move the file to the empty class directory
+                    shutil.move(file_path, class_dir)
+                    if len(os.listdir(train_class_path)) == 0:
+                        print(f"Warning: no samples left in training class {class_name}")
+                    break
+
     print("Done.")
 
     # Delete original folders
