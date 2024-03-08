@@ -48,37 +48,55 @@ if __name__ == "__main__":
     for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images"):
         for file in files:
             resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
-    '''
-    # Load the data into Pytorch datset, transform into tensor for model
-    # Transform to tensors of normalized range using calculated mean and standard deviation
-    dataset_unnormalized = ImageFolder(root=dataset_path, transform=transforms.ToTensor())
+    
+    while True:
+        normalize_yn = input("Normalize data? (y/n) ").lower()
+        if normalize_yn != 'y' or normalize_yn != 'n':
+            continue
+        else:
+            break
 
-    mean = np.zeros(1)
-    std = np.zeros(1)
-    k = 1
-    for image, _ in tqdm(dataset_unnormalized, "Computing mean and std of dataset", len(dataset_unnormalized), unit=" samples"):
-        image = np.array(image)
-        pixels = image.flatten()
+    while True:
+        augment_yn = input("Augment data? (y/n) ").lower()
+        if augment_yn != 'y' or augment_yn != 'n':
+            continue
+        else:
+            break
 
-        for pixel in pixels:
-            pixel_diff = pixel - mean
-            mean += pixel_diff/k
-            std += pixel_diff * (pixel - mean)
-            k += 1
-    std = np.sqrt(std / (k - 2))
+    if augment_yn == 'y':
+        
+        # augment dataset
+    
+    if normalize_yn == 'y':
+        # Load the data into Pytorch datset, transform into tensor for model
+        # Transform to tensors of normalized range using calculated mean and standard deviation
+        dataset_unnormalized = ImageFolder(root=dataset_path, transform=transforms.ToTensor())
 
-    print("Writing new values to file...", end="")
-    meanstd_path = 'meanstd.json'
-    try:
-        with open(meanstd_path, 'r') as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        data = {}
+        mean = np.zeros(1)
+        std = np.zeros(1)
+        k = 1
+        for image, _ in tqdm(dataset_unnormalized, "Computing mean and std of dataset", len(dataset_unnormalized), unit=" samples"):
+            image = np.array(image)
+            pixels = image.flatten()
 
-    data['mean'] = mean
-    data['std'] = std
+            for pixel in pixels:
+                pixel_diff = pixel - mean
+                mean += pixel_diff/k
+                std += pixel_diff * (pixel - mean)
+                k += 1
+        std = np.sqrt(std / (k - 2))
 
-    with open(meanstd_path, 'w') as file:
-        json.dump(data, file, indent=4)
-    print("Done.")
-    '''
+        print("Writing new values to file...", end="")
+        meanstd_path = 'meanstd.json'
+        try:
+            with open(meanstd_path, 'r') as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            data = {}
+
+        data['mean'] = mean
+        data['std'] = std
+
+        with open(meanstd_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        print("Done.")
