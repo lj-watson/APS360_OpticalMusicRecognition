@@ -33,7 +33,7 @@ def resize(img_path, width, height):
             pure_img = Image.open(img_path).convert("1")
             pure_width, pure_height = pure_img.size
             if pure_width != width or pure_height != height:
-                new_img = pure_img.resize((height, width), Image.LANCZOS)
+                new_img = pure_img.resize((height, width), Image.Resampling.LANCZOS)
                 new_img.save(img_path)
         except Exception as e:
             print(f"Error resizing image: {e}")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     dataset_path = get_directory_path()
 
     # Resize all images
-    for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images"):
+    for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images", unit=" images"):
         for file in files:
             resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
 
@@ -53,12 +53,12 @@ if __name__ == "__main__":
     # Transform to tensors of normalized range using calculated mean and standard deviation
     dataset_unnormalized = ImageFolder(root=dataset_path, transform=transforms.ToTensor())
 
-    mean = np.zeroes(3)
-    std = np.zeroes(3)
+    mean = np.zeros(1)
+    std = np.zeros(1)
     k = 1
-    for image, _ in tqdm(dataset_unnormalized, "Computing mean and std of dataset", len(dataset_unnormalized), unit="images"):
+    for image, _ in tqdm(dataset_unnormalized, "Computing mean and std of dataset", len(dataset_unnormalized), unit=" samples"):
         image = np.array(image)
-        pixels = image.reshape((-1, image.shape[2]))
+        pixels = image.flatten()
 
         for pixel in pixels:
             pixel_diff = pixel - mean
