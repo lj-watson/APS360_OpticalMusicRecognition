@@ -9,3 +9,4 @@ matplotlib
 tensorflow
 keras
 Keras-Preprocessing
+opencv-python

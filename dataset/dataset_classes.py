@@ -1,7 +1,7 @@
 """
 @brief List of classes to ignore in datasets, and mapping to unified class names
 
-Last updated: 03/06/24
+Last updated: 03/07/24
 """
 
 ignored_classes = {
