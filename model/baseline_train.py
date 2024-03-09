@@ -53,6 +53,7 @@ def get_accuracy(model, data):
 def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_epochs=1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
+    print(use_cuda)
 
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
@@ -69,9 +70,11 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
 
             #############################################
             # To Enable GPU Usage
+            print(use_cuda)
             if use_cuda and torch.cuda.is_available():
                 imgs = imgs.cuda()
                 labels = labels.cuda()
+                imgs, labels = imgs.to(device), labels.to(device)
             #############################################
 
             out = model(imgs)             # forward pass
@@ -148,7 +151,7 @@ if __name__ == "__main__":
 
     model = LeNet5()
     if use_cuda and torch.cuda.is_available():
-        model.cuda()
+        model = model.cuda()
         print('CUDA is available!  Training on GPU ...')
     else:
         print('CUDA is not available.  Training on CPU ...')
