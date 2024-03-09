@@ -21,6 +21,8 @@ from torchvision import transforms
 from model import CNN
 from baseline import LeNet5
 
+use_cuda = True
+
 # Get the directory of dataset
 def get_directory_path():
     while True:
@@ -69,6 +71,13 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     start_time = time.time()
     for epoch in range(num_epochs):
         for imgs, labels in iter(train_loader):
+
+            #############################################
+            # To Enable GPU Usage
+            if use_cuda and torch.cuda.is_available():
+                imgs = imgs.cuda()
+                labels = labels.cuda()
+            #############################################
 
             out = model(imgs)             # forward pass
             loss = criterion(out, labels) # compute the total loss
@@ -132,5 +141,11 @@ if __name__ == "__main__":
             break
         else:
             continue
+
+    if use_cuda and torch.cuda.is_available():
+        model_name.cuda()
+        print('CUDA is available!  Training on GPU ...')
+    else:
+        print('CUDA is not available.  Training on CPU ...')
 
     train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=40)
