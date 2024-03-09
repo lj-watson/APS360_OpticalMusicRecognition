@@ -57,7 +57,7 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     criterion = nn.CrossEntropyLoss()
     
     if (model.name == "OMR_CNN"):
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)
     else:
         optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
@@ -115,8 +115,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     dataset_path = get_directory_path()
-
-    transform = transforms.Compose([transforms.ToTensor(), '''transforms.Normalize(mean=data['mean'], std=data['std'])'''])
+    ''', transforms.Normalize(mean=data['mean'], std=data['std'])'''
+    # Image folder by default loads 3 colour channels, so transform to grayscale
+    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
     train_dataset = ImageFolder(os.path.join(dataset_path, "train"), transform=transform)
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
     test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
