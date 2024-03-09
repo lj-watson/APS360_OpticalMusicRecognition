@@ -39,11 +39,13 @@ def resize(img_path, width, height):
     if os.path.isfile(img_path) and img_path.lower().endswith(('.png')):
         # Ensure file is black and white
         try:
-            pure_img = Image.open(img_path)
+            pure_img = Image.open(img_path).convert('L')
             pure_width, pure_height = pure_img.size
             if pure_width != width or pure_height != height:
                 new_img = pure_img.resize((height, width), Image.Resampling.LANCZOS)
-                new_img.save(img_path)
+            else:
+                new_img = pure_img
+            new_img.save(img_path)
         except Exception as e:
             print(f"Error resizing image: {e}")
             sys.exit(1)
@@ -98,14 +100,6 @@ def data_augmentation(directory):
 
                     if len(img_list) >= 4:
                         break
-
-                #rows, cols = 2, 2
-                #fig, array = plt.subplots(rows, cols)
-
-                #for j in range(4):
-                    #array[j // cols, j % cols].imshow(img_list[j])
-
-                #plt.show()
 
             else:
                 continue

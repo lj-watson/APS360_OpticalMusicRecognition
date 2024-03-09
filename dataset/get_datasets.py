@@ -191,14 +191,22 @@ if __name__ == "__main__":
         for dir_name in dirs:
             if dir_name != "split-dataset":
                 shutil.rmtree(os.path.join(root, dir_name))
+    # Bring subfolders to original folder level
+    for root, dirs, files in os.walk(split_path):
+        for dir_name in dirs:
+            subfolder_path = os.path.join(root, dir_name)
+            shutil.move(subfolder_path, directory_path)
+    os.rmdir(os.path.join(directory_path, "split-dataset"))
+    # Rename dataset folder
+    parent_folder, old_dir_name = os.path.split(directory_path)
+    new_path = os.path.join(parent_folder, "split-dataset")
+    os.rename(directory_path, new_path)
     print("Done.")
 
-    print(f"Dataset is located in {split_path}.")
-
     # Check how many files in each split
-    test_files = collect_filenames(os.path.join(split_path, "test"))
-    train_files = collect_filenames(os.path.join(split_path, "train"))
-    val_files = collect_filenames(os.path.join(split_path, "val"))
+    test_files = collect_filenames(os.path.join(directory_path, "test"))
+    train_files = collect_filenames(os.path.join(directory_path, "train"))
+    val_files = collect_filenames(os.path.join(directory_path, "val"))
 
     # Verify the quantity of each set
     total_files = len(test_files) + len(train_files) + len(val_files)
