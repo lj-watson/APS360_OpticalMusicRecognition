@@ -125,7 +125,7 @@ if __name__ == "__main__":
         for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing and recolouring images"):
             for file in files:
                 resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
-    
+        
     while True:
         normalize_yn = input("Calculate dataset normalization? (y/n) ").lower()
         if normalize_yn == 'y' or normalize_yn == 'n':
@@ -134,8 +134,8 @@ if __name__ == "__main__":
             continue
 
     while True:
-        augment_yn = input("Augment/Delete augmented data? (y/delete/none) ").lower()
-        if augment_yn == 'y' or augment_yn == 'none' or augment_yn == 'delete':
+        augment_yn = input("Augment/Delete augmented data? (y/n/delete) ").lower()
+        if augment_yn == 'y' or augment_yn == 'n' or augment_yn == 'delete':
             break
         else:
             continue

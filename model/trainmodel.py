@@ -19,9 +19,6 @@ import torchvision
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from model import CNN
-from baseline import LeNet5
-
-use_cuda = True
 
 # Get the directory of dataset
 def get_directory_path():
@@ -53,31 +50,50 @@ def get_accuracy(model, data):
         total += imgs.shape[0]
     return correct / total
 
-def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_epochs=1):
+def get_loss(model, loader, criterion):
+    total_loss = 0.0
+    total_epoch = 0
+    for i, data in enumerate(loader, 0):
+        inputs, labels = data
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        total_loss += loss.item()
+        total_epoch += len(labels)
+    loss = float(total_loss) / (i + 1)
+    return loss
+
+def early_stopping(val_loss, min_val_loss, patience, min_delta, counter):
+    if val_loss < min_val_loss:
+        min_val_loss = val_loss
+        counter = 0
+    elif val_loss > (min_val_loss + min_delta):
+        counter += 1
+        if counter >= patience:
+            return True, min_val_loss, counter
+    return False, min_val_loss, counter
+
+def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_epochs=1, patience = 3, min_delta=10):
+
+    # Initialize minimum validation loss for early stopping
+    min_val_loss = float('inf')
+    counter = 0
+
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
     criterion = nn.CrossEntropyLoss()
     
-    if (model.name == "OMR_CNN"):
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)
-    else:
-        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)
 
     train_acc = np.zeros(num_epochs)
     val_acc = np.zeros(num_epochs)
+    train_loss = np.zeros(num_epochs)
+    val_loss = np.zeros(num_epochs)
 
     # training
     print("Starting training")
     start_time = time.time()
     for epoch in range(num_epochs):
         for imgs, labels in iter(train_loader):
-
-            #############################################
-            # To Enable GPU Usage
-            if use_cuda and torch.cuda.is_available():
-                imgs = imgs.cuda()
-                labels = labels.cuda()
-            #############################################
 
             out = model(imgs)             # forward pass
             loss = criterion(out, labels) # compute the total loss
@@ -88,6 +104,8 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
         # save the current training information
         train_acc[epoch] = (get_accuracy(model, train_loader)) # compute training accuracy
         val_acc[epoch] = (get_accuracy(model, val_loader))  # compute validation accuracy
+        train_loss[epoch] = get_loss(model, train_loader, criterion) # compute training loss
+        val_loss[epoch] = get_loss(model, val_loader, criterion) # compute validation loss
 
         print(("Epoch {}: Train accuracy: {} |"+
                "Validation accuracy: {}").format(
@@ -98,16 +116,29 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
         model_path = get_model_name(model.name, batch_size, learning_rate, epoch)
         torch.save(model.state_dict(), model_path)
 
+        # Check early stopping
+        early_stop, min_val_loss, counter = early_stopping(val_loss[epoch], min_val_loss, patience, min_delta, counter)
+        if early_stop:
+            break
+
     print("Finished training")
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("Total time elapsed: {:.2f} seconds".format(elapsed_time))
 
-    plt.title("Training Curve")
+    plt.title("Training vs Validation Accuracy")
     plt.plot(range(num_epochs), train_acc, label="Train")
     plt.plot(range(num_epochs), val_acc, label="Validation")
-    plt.xlabel("Epochs")
-    plt.ylabel("Training Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Error")
+    plt.legend(loc='best')
+    plt.show()
+
+    plt.title("Training vs Validation Loss")
+    plt.plot(range(num_epochs), train_loss, label="Train")
+    plt.plot(range(num_epochs), val_loss, label="Validation")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
     plt.legend(loc='best')
     plt.show()
 
@@ -124,28 +155,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     dataset_path = get_directory_path()
-    ''', transforms.Normalize(mean=data['mean'], std=data['std'])'''
     # Image folder by default loads 3 colour channels, so transform to grayscale
-    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
+    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor(), 
+                                    transforms.Normalize(mean=data['mean'], std=data['std'])])
     train_dataset = ImageFolder(os.path.join(dataset_path, "train"), transform=transform)
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
     test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
 
-    while True:
-        model_name = input("Enter which model to train (cnn/lenet5): ").lower()
-        if model_name == 'cnn':
-            model = CNN()
-            break
-        elif model_name == 'lenet5':
-            model = LeNet5()
-            break
-        else:
-            continue
-
-    if use_cuda and torch.cuda.is_available():
-        model_name.cuda()
-        print('CUDA is available!  Training on GPU ...')
-    else:
-        print('CUDA is not available.  Training on CPU ...')
+    model = CNN()
 
     train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=40)
