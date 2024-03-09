@@ -51,6 +51,9 @@ def get_accuracy(model, data):
     return correct / total
 
 def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_epochs=1):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
     criterion = nn.CrossEntropyLoss()
