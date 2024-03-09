@@ -1,11 +1,12 @@
 """
 @brief Program to prepare the dataset for training
 
-Last updated: 03/07/24
+Last updated: 03/09/24
 """
 
 import os
 import sys
+import cv2
 import json
 import random
 import numpy as np
@@ -52,23 +53,21 @@ def resize(img_path, width, height):
 
 def add_noise(img):
     deviation = VARIABILITY * random.random()
-    noise = np.random.normal(0, deviation, img.shape)
-    img += noise
-    np.clip(img, 0, 255)
-    return img
+    gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+    white_noise = np.random.normal(0, deviation, gray_img.shape)
+    black_noise = np.random.normal(0, deviation, gray_img.shape)
+
+    gray_img += white_noise
+    gray_img -= black_noise
+
+    np.clip(gray_img, 0, 255, out=gray_img)
+    gray_img = gray_img[..., np.newaxis]
+
+    return gray_img
 
 def data_augmentation(directory):
-
-    datagen = ImageDataGenerator(
-        preprocessing_function=add_noise
-        #rotation_range=15,
-        #width_shift_range=0.5,
-        #height_shift_range=0.5,
-        #shear_range=0.05,
-        #fill_mode='nearest',
-        #channel_shift_range=20,
-        #brightness_range=[0.8, 1.2]
-    )
+    datagen = ImageDataGenerator(preprocessing_function=add_noise)
 
     subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
 
@@ -78,34 +77,36 @@ def data_augmentation(directory):
         folder_path = os.path.join(directory, subfolder)
 
         i = 0
+        total_aug = 0
         for item in items:
             rand = random.random()
 
             if rand < 0.25:
-
                 img_path = os.path.join(folder_path, items[i])
-
-                curr_img = image.load_img(img_path)
-
-                img_list = [curr_img]
+                curr_img = image.load_img(img_path, color_mode='rgb')
                 arr = image.img_to_array(curr_img)
                 arr = arr.reshape((1,) + arr.shape)
 
+                img_list = [image.array_to_img(arr[0])]
+
                 for k, batch in enumerate(datagen.flow(arr, batch_size=1)):
                     new_img = image.array_to_img(batch[0])
-                    img_list.append(new_img)
-
-                    save_path = os.path.join(folder_path, "aug_{}_{}.png".format(item, k))
-                    new_img.save(save_path)
-
+                    new_img_gray = add_noise(image.img_to_array(new_img))
+                    img_list.append(image.array_to_img(new_img_gray))
                     if len(img_list) >= 4:
                         break
+
+                for l in range(1, len(img_list)):
+                    total_aug += 1
+                    save_img = img_list[l]
+                    save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                    save_img.save(save_path)
 
             else:
                 continue
 
             i += 1
-            if (i > item_count - 1):
+            if i > item_count - 1:
                 break
 
 if __name__ == "__main__":
