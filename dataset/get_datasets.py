@@ -204,9 +204,9 @@ if __name__ == "__main__":
     print("Done.")
 
     # Check how many files in each split
-    test_files = collect_filenames(os.path.join(directory_path, "test"))
-    train_files = collect_filenames(os.path.join(directory_path, "train"))
-    val_files = collect_filenames(os.path.join(directory_path, "val"))
+    test_files = collect_filenames(os.path.join(new_path, "test"))
+    train_files = collect_filenames(os.path.join(new_path, "train"))
+    val_files = collect_filenames(os.path.join(new_path, "val"))
 
     # Verify the quantity of each set
     total_files = len(test_files) + len(train_files) + len(val_files)
