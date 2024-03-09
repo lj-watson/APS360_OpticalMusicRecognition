@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     dataset_path = get_directory_path()
 
-    transform = transforms.Compose([transforms.ToTensor(), transforms.Grayscale()])
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=data['mean'], std=data['std'])])
     train_dataset = ImageFolder(os.path.join(dataset_path, "train"), transform=transform)
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
     test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
