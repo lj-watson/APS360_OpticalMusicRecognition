@@ -25,7 +25,7 @@ class LeNet5(nn.Module):
         # In: 120; Out: 84
         self.fc2 = nn.Linear(120, 84)
         # In: 84; Out: 10
-        self.fc3 = nn.Linear(84, 10)
+        self.fc3 = nn.Linear(84, 36)
 
     def forward(self, x):
         x = F.tanh(self.conv1(x))
