@@ -7,20 +7,18 @@ Last updated: 03/08/24
 import json
 import sys
 import os
-import torch
-import numpy as np
 import time
 import torch
+import numpy as np
 import torch.nn as nn
-from torch.utils.data.dataloader import DataLoader
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import torchvision
+
+from torch.utils.data.dataloader import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from baseline import LeNet5
-
-use_cuda = True
 
 # Get the directory of dataset
 def get_directory_path():
@@ -133,6 +131,17 @@ if __name__ == "__main__":
             break
         except ValueError:
             print("Please enter valid integers for Batch Size and Number of Epochs, and a valid float for Learning Rate.")
+
+    while True:
+        cuda_input = input("Use CUDA? (y/n) ").lower()
+        if cuda_input == 'y':
+            use_cuda = True
+            break
+        elif cuda_input == 'n':
+            use_cuda = False
+            break
+        else:
+            continue
 
     model = LeNet5()
     if use_cuda and torch.cuda.is_available():
