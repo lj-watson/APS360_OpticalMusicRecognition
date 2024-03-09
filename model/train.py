@@ -1,7 +1,7 @@
 """
 @brief Program to train the CNN model
 
-Last updated: 03/07/24
+Last updated: 03/08/24
 """
 
 import json
@@ -19,6 +19,7 @@ import torchvision
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from model import CNN
+from baseline import LeNet5
 
 # Get the directory of dataset
 def get_directory_path():
@@ -54,7 +55,11 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    
+    if (model.name == "OMR_CNN"):
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    else:
+        optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     train_acc = np.zeros(num_epochs)
     val_acc = np.zeros(num_epochs)
@@ -116,5 +121,15 @@ if __name__ == "__main__":
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
     test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
 
-    OMR_CNN = CNN()
-    train(OMR_CNN, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=40)
+    while True:
+        model_name = input("Enter which model to train (cnn/lenet5): ").lower()
+        if model_name == 'cnn':
+            model = CNN()
+            break
+        elif model_name == 'lenet5':
+            model = LeNet5()
+            break
+        else:
+            continue
+
+    train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=40)
