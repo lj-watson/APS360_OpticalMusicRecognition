@@ -114,9 +114,16 @@ if __name__ == "__main__":
     dataset_path = get_directory_path()
 
     # Resize all images
-    for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing images"):
-        for file in files:
-            resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
+    while True:
+        resize_yn = input("Resize images and convert to BW? [NECESSARY IF FRESH DATASET] (y/n) ").lower()
+        if resize_yn == 'y' or resize_yn == 'n':
+            break
+        else:
+            continue
+    if resize_yn == 'y':
+        for(root, dirs, files) in tqdm(os.walk(dataset_path), desc="Resizing and recolouring images"):
+            for file in files:
+                resize(os.path.join(root, file), SET_WIDTH, SET_HEIGHT)
     
     while True:
         normalize_yn = input("Calculate dataset normalization? (y/n) ").lower()
@@ -137,8 +144,8 @@ if __name__ == "__main__":
         # Transform to tensors of normalized range using calculated mean and standard deviation
         dataset_unnormalized = ImageFolder(root=dataset_path, transform=transforms.ToTensor())
 
-        mean = np.zeros(1)
-        std = np.zeros(1)
+        mean = 0.0
+        std = 0.0
         k = 1
         for image, _ in tqdm(dataset_unnormalized, "Computing mean and std of dataset", len(dataset_unnormalized), unit=" samples"):
             image = np.array(image)
@@ -159,8 +166,8 @@ if __name__ == "__main__":
         except FileNotFoundError:
             data = {}
 
-        data['mean'] = mean
-        data['std'] = std
+        data['mean'] = [mean]
+        data['std'] = [std]
 
         with open(meanstd_path, 'w') as file:
             json.dump(data, file, indent=4)
