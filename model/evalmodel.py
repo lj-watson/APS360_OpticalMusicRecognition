@@ -20,26 +20,21 @@ while True:
     try:
         bs = int(input("Enter Batch Size Used During Training: "))
         lr = float(input("Enter Learning Rate Used During Training: "))
-        ep = int(input("Enter Number of Epochs Used During Training: "))
+        ep = int(input("Enter Number of Epochs Used During Training: ")) - 1
         break
     except ValueError:
-        print("Please enter valid integers for Batch Size and Number of Epochs, and a valid float for Learning Rate.")
+        print("Invalid input.")
 
 dataset_path = get_directory_path()
 
 # Image folder by default loads 3 colour channels, so transform to grayscale
 transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
 test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
-model_path = get_model_name(net.name, batch_size=bs, learning_rate=lr, epoch=ep)
 
+model_path = get_model_name(net.name, batch_size=bs, learning_rate=lr, epoch=ep)
 state = torch.load(model_path)
 net.load_state_dict(state)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle = True)
 
-if torch.cuda.is_available():
-    device = torch.device("cuda")
-else:
-    device = torch.device("cpu")
-net = net.to(device)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=bs, shuffle = True)
 
 print("Test Classification Accuracy:", get_accuracy(net, test_loader))

@@ -86,8 +86,7 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     criterion = nn.CrossEntropyLoss()
     
     #optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.0004)
-    #optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    optimizer = optim.SGD(model.parameters(), lr = learning_rate, weight_decay= 0.0004, momentum = 0.9)
+    optimizer = optim.SGD(model.parameters(), lr = learning_rate, weight_decay= 0.001, momentum = 0.9)
 
     train_acc = np.zeros(num_epochs)
     val_acc = np.zeros(num_epochs)
@@ -141,17 +140,17 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     plt.xlabel("Epoch")
     plt.ylabel("Accuracy")
     plt.legend(loc='best')
-    plt.ylim(0.7, 1)  # Set y-axis limits from 0 to 1
+    plt.ylim(0.8, 1)  # Set y-axis limits from 0 to 1
     plt.savefig("training_validation_acc.png")
 
     plt.figure()
     plt.title("Training vs Validation Loss")
-    plt.plot(range(num_epochs), train_loss, label="Traizn")
+    plt.plot(range(num_epochs), train_loss, label="Train")
     plt.plot(range(num_epochs), val_loss, label="Validation")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend(loc='best')
-    plt.ylim(0, 1)  # Set y-axis limits from 0 to 1
+    plt.ylim(0, 0.5)  # Set y-axis limits from 0 to 1
     plt.savefig("training_validation_loss.png")
 
 if __name__ == "__main__":
@@ -181,4 +180,4 @@ if __name__ == "__main__":
         device = torch.device("cpu")
     model = model.to(device)
 
-    train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=20)
+    train(model, train_dataset, val_dataset, batch_size=16, learning_rate=0.003, num_epochs=15)
