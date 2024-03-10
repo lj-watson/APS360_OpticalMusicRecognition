@@ -18,9 +18,9 @@ while True:
 
 while True:
     try:
-        bs = int(input("Enter Batch Size: "))
-        lr = float(input("Enter Learning Rate: "))
-        ep = int(input("Enter Number of Epochs: "))
+        bs = int(input("Enter Batch Size used during Training: "))
+        lr = float(input("Enter Learning Rate used during Training: "))
+        ep = int(input("Enter Number of Epochs used during Training: "))
         break
     except ValueError:
         print("Please enter valid integers for Batch Size and Number of Epochs, and a valid float for Learning Rate.")
