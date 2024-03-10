@@ -50,10 +50,19 @@ def get_accuracy(model, data):
         total += imgs.shape[0]
     return correct / total
 
+def get_loss(model, loader, criterion):
+    total_loss = 0.0
+    total_epoch = 0
+    for i, data in enumerate(loader, 0):
+        inputs, labels = data
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        total_loss += loss.item()
+        total_epoch += len(labels)
+    loss = float(total_loss) / (i + 1)
+    return loss
+
 def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_epochs=1):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-    print(use_cuda)
 
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
@@ -62,6 +71,8 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
 
     train_acc = np.zeros(num_epochs)
     val_acc = np.zeros(num_epochs)
+    train_loss = np.zeros(num_epochs)
+    val_loss = np.zeros(num_epochs)
 
     print("Starting training...")
     start_time = time.time()
@@ -70,11 +81,9 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
 
             #############################################
             # To Enable GPU Usage
-            print(use_cuda)
             if use_cuda and torch.cuda.is_available():
                 imgs = imgs.cuda()
                 labels = labels.cuda()
-                imgs, labels = imgs.to(device), labels.to(device)
             #############################################
 
             out = model(imgs)             # forward pass
@@ -86,8 +95,10 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
         # save the current training information
         train_acc[epoch] = (get_accuracy(model, train_loader)) # compute training accuracy
         val_acc[epoch] = (get_accuracy(model, val_loader))  # compute validation accuracy
+        train_loss[epoch] = get_loss(model, train_loader, criterion) # compute training loss
+        val_loss[epoch] = get_loss(model, val_loader, criterion) # compute validation loss
 
-        print(("Epoch {}: Train accuracy: {} |"+
+        print(("Epoch {}: Train accuracy: {} | "+
                "Validation accuracy: {}").format(
                    epoch + 1,
                    train_acc[epoch],
@@ -101,11 +112,19 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     elapsed_time = end_time - start_time
     print("Total time elapsed: {:.2f} seconds".format(elapsed_time))
 
-    plt.title("Training Curve")
+    plt.title("Training vs Validation Accuracy")
     plt.plot(range(num_epochs), train_acc, label="Train")
     plt.plot(range(num_epochs), val_acc, label="Validation")
-    plt.xlabel("Epochs")
-    plt.ylabel("Training Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Error")
+    plt.legend(loc='best')
+    plt.show()
+
+    plt.title("Training vs Validation Loss")
+    plt.plot(range(num_epochs), train_loss, label="Train")
+    plt.plot(range(num_epochs), val_loss, label="Validation")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
     plt.legend(loc='best')
     plt.show()
 
@@ -151,7 +170,7 @@ if __name__ == "__main__":
 
     model = LeNet5()
     if use_cuda and torch.cuda.is_available():
-        model = model.cuda()
+        model.cuda()
         print('CUDA is available!  Training on GPU ...')
     else:
         print('CUDA is not available.  Training on CPU ...')
