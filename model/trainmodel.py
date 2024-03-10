@@ -42,6 +42,9 @@ def get_accuracy(model, data):
     total = 0
     for imgs, labels in data:
 
+        imgs = imgs.to(device)
+        labels = labels.to(device)
+
         output = model(imgs)
 
         #select index with maximum prediction score
@@ -52,13 +55,13 @@ def get_accuracy(model, data):
 
 def get_loss(model, loader, criterion):
     total_loss = 0.0
-    total_epoch = 0
     for i, data in enumerate(loader, 0):
         inputs, labels = data
+        inputs = inputs.to(device)
+        labels = labels.to(device)
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         total_loss += loss.item()
-        total_epoch += len(labels)
     loss = float(total_loss) / (i + 1)
     return loss
 
@@ -82,7 +85,9 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle = True)
     criterion = nn.CrossEntropyLoss()
     
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)
+    #optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.0004)
+    #optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = optim.SGD(model.parameters(), lr = learning_rate, weight_decay= 0.0004, momentum = 0.9)
 
     train_acc = np.zeros(num_epochs)
     val_acc = np.zeros(num_epochs)
@@ -94,6 +99,9 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     start_time = time.time()
     for epoch in range(num_epochs):
         for imgs, labels in iter(train_loader):
+
+            imgs = imgs.to(device)
+            labels = labels.to(device)
 
             out = model(imgs)             # forward pass
             loss = criterion(out, labels) # compute the total loss
@@ -107,7 +115,7 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
         train_loss[epoch] = get_loss(model, train_loader, criterion) # compute training loss
         val_loss[epoch] = get_loss(model, val_loader, criterion) # compute validation loss
 
-        print(("Epoch {}: Train accuracy: {} |"+
+        print(("Epoch {}: Train accuracy: {} | "+
                "Validation accuracy: {}").format(
                    epoch + 1,
                    train_acc[epoch],
@@ -126,21 +134,25 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     elapsed_time = end_time - start_time
     print("Total time elapsed: {:.2f} seconds".format(elapsed_time))
 
+    plt.figure()
     plt.title("Training vs Validation Accuracy")
     plt.plot(range(num_epochs), train_acc, label="Train")
     plt.plot(range(num_epochs), val_acc, label="Validation")
     plt.xlabel("Epoch")
-    plt.ylabel("Error")
+    plt.ylabel("Accuracy")
     plt.legend(loc='best')
-    plt.show()
+    plt.ylim(0.7, 1)  # Set y-axis limits from 0 to 1
+    plt.savefig("training_validation_acc.png")
 
+    plt.figure()
     plt.title("Training vs Validation Loss")
-    plt.plot(range(num_epochs), train_loss, label="Train")
+    plt.plot(range(num_epochs), train_loss, label="Traizn")
     plt.plot(range(num_epochs), val_loss, label="Validation")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend(loc='best')
-    plt.show()
+    plt.ylim(0, 1)  # Set y-axis limits from 0 to 1
+    plt.savefig("training_validation_loss.png")
 
 if __name__ == "__main__":
 
@@ -156,12 +168,17 @@ if __name__ == "__main__":
 
     dataset_path = get_directory_path()
     # Image folder by default loads 3 colour channels, so transform to grayscale
-    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor(), 
-                                    transforms.Normalize(mean=data['mean'], std=data['std'])])
+    #transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor(), transforms.Normalize(mean=data['mean'], std=data['std'])])
+    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
     train_dataset = ImageFolder(os.path.join(dataset_path, "train"), transform=transform)
     val_dataset = ImageFolder(os.path.join(dataset_path, "val"), transform=transform)
-    test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
 
     model = CNN()
 
-    train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=40)
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    model = model.to(device)
+
+    train(model, train_dataset, val_dataset, batch_size=64, learning_rate=0.003, num_epochs=20)
