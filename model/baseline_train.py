@@ -1,7 +1,7 @@
 """
-@brief Program to train the CNN model
+@brief Program to train the baseline model
 
-Last updated: 03/08/24
+Last updated: 03/10/24
 """
 
 import json

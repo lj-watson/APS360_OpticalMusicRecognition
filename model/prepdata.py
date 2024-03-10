@@ -1,7 +1,7 @@
 """
 @brief Program to prepare the dataset for training
 
-Last updated: 03/09/24
+Last updated: 03/10/24
 """
 
 import os
@@ -51,7 +51,7 @@ def resize(img_path, width, height):
             print(f"Error resizing image: {e}")
             sys.exit(1)
 
-def add_noise(img):
+def gaussian_noise(img):
     deviation = VARIABILITY * random.random()
     gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
@@ -66,8 +66,20 @@ def add_noise(img):
 
     return gray_img
 
+def salt_and_pepper(img):
+    augmented_image = np.copy(img)
+
+    salt_mask = np.random.rand(*augmented_image.shape[:2]) < 0.05
+    augmented_image[salt_mask] = 255
+
+    pepper_mask = np.random.rand(*augmented_image.shape[:2]) < 0.05
+    augmented_image[pepper_mask] = 0
+
+    return augmented_image
+
 def data_augmentation(directory):
-    datagen = ImageDataGenerator(preprocessing_function=add_noise)
+    datagen_gaussian = ImageDataGenerator(preprocessing_function=gaussian_noise)
+    datagen_salt_pepper = ImageDataGenerator(preprocessing_function=salt_and_pepper)
 
     subfolders = [f.path for f in os.scandir(directory) if f.is_dir()]
 
@@ -81,29 +93,146 @@ def data_augmentation(directory):
         for item in items:
             rand = random.random()
 
-            if rand < 0.25:
-                img_path = os.path.join(folder_path, items[i])
-                curr_img = image.load_img(img_path, color_mode='rgb')
-                arr = image.img_to_array(curr_img)
-                arr = arr.reshape((1,) + arr.shape)
+            if item_count > 500:
 
-                img_list = [image.array_to_img(arr[0])]
+                if rand < 0.15:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='rgb')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
 
-                for k, batch in enumerate(datagen.flow(arr, batch_size=1)):
-                    new_img = image.array_to_img(batch[0])
-                    new_img_gray = add_noise(image.img_to_array(new_img))
-                    img_list.append(image.array_to_img(new_img_gray))
-                    if len(img_list) >= 4:
-                        break
+                    img_list = [image.array_to_img(arr[0])]
 
-                for l in range(1, len(img_list)):
-                    total_aug += 1
-                    save_img = img_list[l]
-                    save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
-                    save_img.save(save_path)
+                    for k, batch in enumerate(datagen_gaussian.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = gaussian_noise(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
 
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                elif rand < 0.30:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='grayscale')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
+
+                    img_list = [image.array_to_img(arr[0])]
+
+                    for k, batch in enumerate(datagen_salt_pepper.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = salt_and_pepper(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
+
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                else:
+                    continue
+
+            elif 100 <= item_count <= 499:
+
+                if rand < 0.30:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='rgb')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
+
+                    img_list = [image.array_to_img(arr[0])]
+
+                    for k, batch in enumerate(datagen_gaussian.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = gaussian_noise(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
+
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                elif rand < 0.60:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='grayscale')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
+
+                    img_list = [image.array_to_img(arr[0])]
+
+                    for k, batch in enumerate(datagen_salt_pepper.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = salt_and_pepper(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
+
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                else:
+                    continue
+            
             else:
-                continue
+
+                if rand < 0.50:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='rgb')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
+
+                    img_list = [image.array_to_img(arr[0])]
+
+                    for k, batch in enumerate(datagen_gaussian.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = gaussian_noise(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
+
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                elif rand < 1.00:
+                    img_path = os.path.join(folder_path, items[i])
+                    curr_img = image.load_img(img_path, color_mode='grayscale')
+                    arr = image.img_to_array(curr_img)
+                    arr = arr.reshape((1,) + arr.shape)
+
+                    img_list = [image.array_to_img(arr[0])]
+
+                    for k, batch in enumerate(datagen_salt_pepper.flow(arr, batch_size=1)):
+                        new_img = image.array_to_img(batch[0])
+                        new_img_gray = salt_and_pepper(image.img_to_array(new_img))
+                        img_list.append(image.array_to_img(new_img_gray))
+                        if len(img_list) >= 4:
+                            break
+
+                    for l in range(1, len(img_list)):
+                        total_aug += 1
+                        save_img = img_list[l]
+                        save_path = os.path.join(folder_path, "aug{}_{}.png".format(total_aug, l))
+                        save_img.save(save_path)
+
+                else:
+                    continue
 
             i += 1
             if i > item_count - 1:
