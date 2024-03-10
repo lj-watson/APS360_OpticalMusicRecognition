@@ -118,6 +118,7 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     plt.xlabel("Epoch")
     plt.ylabel("Error")
     plt.legend(loc='best')
+    plt.savefig("baseline_train-val_acc.png")
     plt.show()
 
     plt.title("Training vs Validation Loss")
@@ -126,6 +127,7 @@ def train(model, train_data, val_data, batch_size=32, learning_rate=0.01, num_ep
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend(loc='best')
+    plt.savefig("baseline_train-val_loss.png")
     plt.show()
 
 if __name__ == "__main__":
