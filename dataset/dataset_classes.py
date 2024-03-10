@@ -61,6 +61,7 @@ ignored_classes = {
         "Multiple-Half-Notes", 
         "Multiple-Quarter-Notes", 
         "Multiple-Sixteenth-Notes", 
+        "Other",
         "Staccatissimo", 
         "Tie-Slur"
     ],
