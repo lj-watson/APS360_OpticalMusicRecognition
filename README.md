@@ -1,5 +1,9 @@
-# APS360 Project: Sheet Music Recognition
+# Sheet Music Recognition
 
 ## Description
 
-The goal of this project is to create a deep learning model capable of recognizing notes in printed format.
+This project uses multiple alogirthms and a deep learning model to transform digital printed sheet music into audio format.
+
+## Requirements
+
+All required libraries can be installed using pip: `pip install -r requirements.txt`
