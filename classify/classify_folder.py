@@ -2,15 +2,56 @@
 @brief Classify a folder of images using the best model
 """
 
-import torch
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
-import sys
 import os
+import sys
+import torch
+import torchvision
+
+from torchvision import transforms
 from PIL import Image
+
+# Import the main CNN model from another file
 sys.path.append(os.path.abspath('../model'))
 from model import CNN
-from trainmodel import get_model_name
+
+# Dictionary mapping class numbers to class labels
+class_labels = {
+    0: "2-4-Time",
+    1: "2-8-Time", 
+    2: "3-4-Time", 
+    3: "3-8-Time",
+    4: "4-4-Time",
+    5: "5-4-Time",
+    6: "6-8-Time",
+    7: "Accent",
+    8: "Barline",
+    9: "Beam",
+    10: "Cut-Time",
+    11: "Dot",
+    12: "Eighth-Note",
+    13: "Eighth-Rest",
+    14: "F-Clef",
+    15: "Fermata",
+    16: "Flat",
+    17: "G-Clef",
+    18: "Half-Note",
+    19: "Marcato",
+    20: "Mordent",
+    21: "Multiple-Half-Notes",
+    22: "Natural",
+    23: "Quarter-Note",
+    24: "Quarter-Rest",
+    25: "Sharp",
+    26: "Sixteeth-Note",
+    27: "Sixteeth-Rest",
+    28: "Sixty-Four-Note",
+    29: "Sixty-Four-Rest",
+    30: "Tenuto",
+    31: "Thirty-Two-Note",
+    32: "Thirty-Two-Rest",
+    33: "Whole-Half-Rest",
+    34: "Whole-Note"
+}
 
 # Get the model path
 while True:
@@ -27,7 +68,11 @@ model.load_state_dict(state)
 model.eval()
 
 # Transformations for the image input
-transform = transforms.Compose([transforms.Grayscale(), transforms.Resize((224,224)), transforms.ToTensor()])
+transform = transforms.Compose([
+    transforms.Grayscale(), 
+    transforms.Resize((224,224)), 
+    transforms.ToTensor()
+])
 
 # Get the path containing images to classify
 while True:
@@ -39,7 +84,7 @@ while True:
 
 # Loop through each image in folder and get prediction
 predictions = []
-for image_name in os.listdir(img_dir):
+for image_name in sorted(os.listdir(img_dir)):
 
     img_path = os.path.join(img_dir, image_name)
     if not os.path.isfile(img_path):
@@ -56,6 +101,11 @@ for image_name in os.listdir(img_dir):
         _, pred = torch.max(output, 1)
         predictions.append(pred.item())
 
-text_string = ' : '.join([f'{value}' for _, value in enumerate(predictions, start=1)])
+predicted_labels = [class_labels.get(class_number, "Unknown") for class_number in predictions]
+text_string = ' : '.join(predicted_labels)
 text_string = f'<{text_string}>'
 print(text_string)
+
+# text_string = ' : '.join([f'{value}' for _, value in enumerate(predictions, start=1)])
+# text_string = f'<{text_string}>'
+# print(text_string)
