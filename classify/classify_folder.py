@@ -10,6 +10,10 @@ import torchvision
 from torchvision import transforms
 from PIL import Image
 
+# Transform images to black and white for better classification
+def img_to_bw(img):
+    return img.convert("1")
+
 # Import the main CNN model from another file
 sys.path.append(os.path.abspath('../model'))
 from model import CNN
@@ -71,6 +75,7 @@ model.eval()
 transform = transforms.Compose([
     transforms.Grayscale(), 
     transforms.Resize((224,224)), 
+    transforms.Lambda(lambda img: img_to_bw(img)),
     transforms.ToTensor()
 ])
 
@@ -105,7 +110,3 @@ predicted_labels = [class_labels.get(class_number, "Unknown") for class_number i
 text_string = ' : '.join(predicted_labels)
 text_string = f'<{text_string}>'
 print(text_string)
-
-# text_string = ' : '.join([f'{value}' for _, value in enumerate(predictions, start=1)])
-# text_string = f'<{text_string}>'
-# print(text_string)
