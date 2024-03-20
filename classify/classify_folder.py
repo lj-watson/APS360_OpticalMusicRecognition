@@ -14,27 +14,20 @@ from trainmodel import get_model_name
 
 # Get the model path
 while True:
-    inp = input("Enter batch size, learning rate, and epoch of model to use: ")
-    inputs = inp.split()
-    if len(inputs) == 3:
-        try:
-            bs, lr, ep = map(float, inputs)
-            bs, ep = int(bs), int(ep) - 1
-            break
-        except ValueError:
-            print("Invalid input.")
+    model_path = input("Enter model path: ")
+    if not model_path or not os.path.isdir(model_path):
+        print("Invalid input, try again")
     else:
-        print("Invalid input.")
+        break
 
 model = CNN()
-model_path = get_model_name(model.name, batch_size=bs, learning_rate=lr, epoch=ep)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 state = torch.load(model_path, map_location=device)
 model.load_state_dict(state)
 model.eval()
 
 # Transformations for the image input
-transform = transforms.Compose([transforms.Grayscale(), transforms.Resize(224,224), transforms.ToTensor()])
+transform = transforms.Compose([transforms.Grayscale(), transforms.Resize(224), transforms.ToTensor()])
 
 # Get the path containing images to classify
 while True:
