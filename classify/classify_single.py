@@ -65,13 +65,12 @@ while True:
     main_input = input("Which model to test? (main/baseline): ").lower()
     if main_input in ['main', 'baseline']:
         main_model = CNN() if main_input == 'main' else LeNet5()
-        model_path = "/Users/danielyu/Desktop/APS360 GitHub Repo/APS360-OpticalMusicRecognition/classify/model_OMR_CNN_bs16_lr0.003_epoch14"  if main_input == 'main' else "/Users/danielyu/Desktop/APS360 GitHub Repo/APS360-OpticalMusicRecognition/classify/model_LeNet5_Baseline_bs32_lr0.001_epoch9"
         break
 
-# Get the path containing images to classify
+# Get the model path
 while True:
-    img_dir = input("Enter directory path to be classified: ")
-    if not img_dir or not os.path.isdir(img_dir):
+    model_path = input("Enter model path: ")
+    if not model_path:
         print("Invalid input, try again")
     else:
         break
@@ -90,14 +89,27 @@ transform = transforms.Compose([
 ])
 
 # ------------------ TEST ------------------ #
-# Change this path for single image testing
-img_path = "/Users/danielyu/Desktop/APS360 GitHub Repo/APS360-OpticalMusicRecognition/classify/example/Screenshot 2024-03-20 155207.png"
+
+# Change this name for single image testing
+while True:
+    img_name = input("Enter image name: ")
+    if not img_name:
+        print("Invalid input, try again")
+    else:
+        break
+
+permanent_path = os.path.dirname(os.path.dirname(model_path))
+img_path = os.path.join(permanent_path, "classify/example", img_name)
+
+# img_path = "/Users/danielyu/Desktop/APS360 GitHub Repo/APS360-OpticalMusicRecognition/classify/example/Screenshot 2024-03-20 155207.png"
+
 img = Image.open(img_path)
 input_tensor = transform(img)
 input_batch = input_tensor.unsqueeze(0)
 
 with torch.no_grad():
     output = main_model(input_batch)
+
 # ------------------ TEST ------------------ #
 
 # Find the predicted class by finding th highest probability for each class
