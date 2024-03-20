@@ -32,9 +32,11 @@ transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
 test_dataset = ImageFolder(os.path.join(dataset_path, "test"), transform=transform)
 
 model_path = get_model_name(net.name, batch_size=bs, learning_rate=lr, epoch=ep)
-state = torch.load(model_path)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+state = torch.load(model_path, map_location=device)
 net.load_state_dict(state)
+net.eval()
 
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=bs, shuffle = True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle = True)
 
 print("Test Classification Accuracy:", get_accuracy(net, test_loader))
