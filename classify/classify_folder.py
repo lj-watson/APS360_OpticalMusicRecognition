@@ -15,7 +15,7 @@ from trainmodel import get_model_name
 # Get the model path
 while True:
     model_path = input("Enter model path: ")
-    if not model_path or not os.path.isdir(model_path):
+    if not model_path:
         print("Invalid input, try again")
     else:
         break
