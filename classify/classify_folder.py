@@ -10,10 +10,6 @@ import torchvision
 from torchvision import transforms
 from PIL import Image
 
-# Transform images to black and white for better classification
-def img_to_bw(img):
-    return img.convert("1")
-
 # Import the main CNN model from another file
 sys.path.append(os.path.abspath('../model'))
 from model import CNN
@@ -75,7 +71,6 @@ model.eval()
 transform = transforms.Compose([
     transforms.Grayscale(), 
     transforms.Resize((224,224)), 
-    transforms.Lambda(lambda img: img_to_bw(img)),
     transforms.ToTensor()
 ])
 
