@@ -27,7 +27,7 @@ model.load_state_dict(state)
 model.eval()
 
 # Transformations for the image input
-transform = transforms.Compose([transforms.Grayscale(), transforms.Resize(224), transforms.ToTensor()])
+transform = transforms.Compose([transforms.Grayscale(), transforms.Resize((224,224)), transforms.ToTensor()])
 
 # Get the path containing images to classify
 while True:
@@ -56,4 +56,6 @@ for image_name in os.listdir(img_dir):
         _, pred = torch.max(output, 1)
         predictions.append(pred.item())
 
-print(predictions)
+text_string = ' : '.join([f'{value}' for _, value in enumerate(predictions, start=1)])
+text_string = f'<{text_string}>'
+print(text_string)
