@@ -49,7 +49,6 @@ ignored_classes = {
         "Double-Flat", 
         "Double-Sharp", 
         "Eighth-Grace-Note", 
-        "Multiple-Hlaf-Notes", 
         "Onehundred-Twenty-Eight-Note", 
     ],
 
@@ -58,7 +57,6 @@ ignored_classes = {
         "Common-Time", 
         "Eighth-Grace-Note", 
         "Multiple-Eighth-Notes", 
-        "Multiple-Half-Notes", 
         "Multiple-Quarter-Notes", 
         "Multiple-Sixteenth-Notes", 
         "Other",
