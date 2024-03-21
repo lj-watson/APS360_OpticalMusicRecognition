@@ -117,6 +117,6 @@ text_string = f'<{text_string}>'
 # Write data to json file
 data = {"classification": text_string}
 filename = 'symbols.json'
-json_path = f'{output_path}{filename}'
+json_path = f'{output_path}/{filename}'
 with open(json_path, 'w') as file:
     json.dump(data, file)
