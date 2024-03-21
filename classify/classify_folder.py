@@ -6,6 +6,7 @@ import os
 import sys
 import torch
 import torchvision
+import json
 
 from torchvision import transforms
 from PIL import Image
@@ -82,6 +83,14 @@ while True:
     else:
         break
 
+# Path to write data to
+while True:
+    output_path = input("Enter folder path where output will be stored: ")
+    if not output_path or not os.path.isdir(output_path):
+        print("Invalid input, try again")
+    else:
+        break
+
 # Loop through each image in folder and get prediction
 predictions = []
 for image_name in sorted(os.listdir(img_dir)):
@@ -104,4 +113,10 @@ for image_name in sorted(os.listdir(img_dir)):
 predicted_labels = [class_labels.get(class_number, "Unknown") for class_number in predictions]
 text_string = ' : '.join(predicted_labels)
 text_string = f'<{text_string}>'
-print(text_string)
+
+# Write data to json file
+data = {"classification": text_string}
+filename = 'symbols.json'
+json_path = f'{output_path}{filename}'
+with open(json_path, 'w') as file:
+    json.dump(data, file)
