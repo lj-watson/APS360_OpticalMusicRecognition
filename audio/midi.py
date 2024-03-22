@@ -150,8 +150,8 @@ if key_starting >= key_stopping:
 # TODO: improve this instead of counting number of flats/sharps
 # Count the number of flats or sharps appearing
 # If there are both flats and sharps then just assume the key to be C major
-num_sharps = symbol_items[key_starting:key_stopping].count(' Sharp ')
-num_flats = symbol_items[key_starting:key_stopping].count(' Flat ')
+num_sharps = symbol_items[key_starting:key_stopping].count('Sharp')
+num_flats = symbol_items[key_starting:key_stopping].count('Flat')
 if num_sharps != 0 and num_flats != 0:
     key = "C"
 elif num_sharps == 0:
