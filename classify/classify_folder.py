@@ -111,7 +111,7 @@ for image_name in sorted(os.listdir(img_dir)):
         predictions.append(pred.item())
 
 predicted_labels = [class_labels.get(class_number, "Unknown") for class_number in predictions]
-text_string = ' : '.join(predicted_labels)
+text_string = ':'.join(predicted_labels)
 text_string = f'<{text_string}>'
 
 # Write data to json file

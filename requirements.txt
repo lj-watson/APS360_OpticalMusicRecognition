@@ -11,3 +11,4 @@ keras
 Keras-Preprocessing
 opencv-python
 mido
+midi2audio
