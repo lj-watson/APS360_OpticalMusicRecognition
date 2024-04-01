@@ -61,13 +61,14 @@ note_mapping_cclef = {
     'B3': 60
 }
 
+# Duration according to 120 BPM
 duration_mapping = {
-    'Quarter': 0,
-    'Half': 0,
-    'Whole': 0,
-    'Eigth': 0,
-    'Sixteenth': 0,
-    'Thirty-Two': 0
+    'Quarter': 480,
+    'Half': 960,
+    'Whole': 1920,
+    'Eigth': 240,
+    'Sixteenth': 120,
+    'Thirty-Two': 60
 }
 
 # Get the symbols and octaves string
@@ -80,6 +81,8 @@ with open("symbols.json", 'r') as file:
     data = json.load(file)
 
 symbols = data['classification']
+
+print(symbols)
 
 # Make sure we have the same number of symbols and octaves
 octave_items = octaves.strip("<>").split(":")
