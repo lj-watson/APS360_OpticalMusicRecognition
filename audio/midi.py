@@ -17,6 +17,7 @@ sharp_key_signatures = {
     6: "F#",
     7: "C#"
 }
+
 flat_key_signatures = {
     0: "C",
     1: "Dm",
@@ -44,6 +45,7 @@ note_mapping_gclef = {
     'F5': 60,
     'G5': 60
 }
+
 note_mapping_cclef = {
     'E2': 60,
     'F2': 60,
@@ -58,6 +60,7 @@ note_mapping_cclef = {
     'A3': 60,
     'B3': 60
 }
+
 duration_mapping = {
     'Quarter': 0,
     'Half': 0,
@@ -126,6 +129,7 @@ track.append(MetaMessage('time_signature', numerator=int(time_sig_parts[0]), den
 # Get key from all the accidentals before the time signature
 # In case of errors we assume the key to be C major
 
+
 # Check if we have a clef element, if not assume G clef
 clef = 'G-Clef'
 clef_indx = -1
@@ -136,6 +140,7 @@ for indx, symbol in enumerate(symbol_items):
         break
     elif indx > 2: # Probably an error at this point
         break
+
 # Check the time signature appears after the clef
 key_stopping = time_indx
 if time_indx == -1:
@@ -152,14 +157,14 @@ if key_starting >= key_stopping:
 # If there are both flats and sharps then just assume the key to be C major
 num_sharps = symbol_items[key_starting:key_stopping].count('Sharp')
 num_flats = symbol_items[key_starting:key_stopping].count('Flat')
-if num_sharps != 0 and num_flats != 0:
-    key = "C"
-elif num_sharps == 0:
+
+if num_sharps == 0:
     key = flat_key_signatures.get(num_flats, "UNKNOWN")
 else:
     key = sharp_key_signatures.get(num_sharps, "UNKNOWN")
+
 if key == "UNKNOWN":
-    print("Warning: too many sharps/flats! Setting key signature to C")
+    print("Warning: Too many sharps/flats! Setting key signature to C")
     key = "C"
 
 # Finally append key
