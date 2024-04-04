@@ -64,12 +64,19 @@ note_mapping_gclef = {
 # Duration set to 120 BPM
 duration_mapping = {
     'Quarter-Note': 480,
+    'Quarter-Rest': 480,
     'Half-Note': 960,
+    'Half-Rest': 960,
     'Whole-Note': 1920,
+    'Whole-Rest': 1920,
     'Eighth-Note': 240,
+    'Eighth-Rest': 240,
     'Sixteenth-Note': 120,
+    'Sixteenth-Rest': 120,
     'Thirty-Two-Note': 60,
-    'Sixty-Four-Note': 30
+    'Thirty-Two-Rest': 60,
+    'Sixty-Four-Note': 30,
+    'Sixty-Four-Rest': 30
 }
 
 # Get the symbols and octaves string
@@ -84,6 +91,7 @@ with open("symbols.json", 'r') as file:
 symbols = data['classification']
 
 symbols_string = symbols
+
 valid_notes = ["Whole_Note",
                  "Half-Note",
                  "Quarter-Note",
@@ -92,8 +100,16 @@ valid_notes = ["Whole_Note",
                  "Thirty-Two-Note",
                  "Sixty-Four-Note"]
 
+valid_rests = ["Whole_Rest",
+               "Half-Rest",
+               "Quarter-Rest",
+               "Eighth-Rest",
+               "Sixteeth-Rest",
+               "Thirty-Two-Rest",
+               "Sixty-Four-Rest"]
+
 notes = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_notes]
-#rests =
+rests = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_rests]
 
 # Make sure we have the same number of symbols and octaves
 octave_items = octaves.strip("<>").split(":")
@@ -188,23 +204,20 @@ track.append(MetaMessage("key_signature", key=key))
 # Initialize the MIDI ticks 
 cumulative_ticks = 0
 
-# Process notes and durations
+# Process notes, rests, and durations
 for note, duration_sym in zip(octave_items, symbol_items):
-    # if note == 'rest':
-    #     # Calculate MIDI tick duration
-    #     ticks = duration_mapping[duration]
-    #     # Skip some length
-    #     cumulative_ticks += ticks
-
     # Get note and duration from mapping dictionaries 
     midi_note = note_mapping_gclef.get(note, None)
     ticks = duration_mapping.get(duration_sym, None)
 
     # Checks if both notes and duration are valid
     if midi_note is not None and ticks is not None and duration_sym in valid_notes:
-        print(f"Note: {note}, {duration_sym}")
         track.append(Message('note_on', note=midi_note, velocity=64, time=0))
         track.append(Message('note_off', note=midi_note, velocity=64, time=ticks))
+        print(f"Note: {note}, {duration_sym}")
+    elif duration_sym in valid_rests:
+        track.append(Message('note_off', note=0, velocity=0, time=ticks))
+        print(f"Rest: {duration_sym}")
     else: 
         # print(f"Invalid note or duration: {note}, {duration_sym}")
         print(f"Not a note: {note}, {duration_sym}")
