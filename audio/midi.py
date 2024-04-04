@@ -33,42 +33,43 @@ flat_key_signatures = {
 # TODO: fill this in
 note_mapping_gclef = {
     'C4': 60,
-    'D4': 60,
-    'E4': 60,
-    'F4': 60,
-    'G4': 60,
-    'A4': 60,
-    'B4': 60,
-    'C5': 60,
-    'D5': 60,
-    'E5': 60,
-    'F5': 60,
-    'G5': 60
+    'D4': 62,
+    'E4': 64,
+    'F4': 65,
+    'G4': 67,
+    'A4': 69,
+    'B4': 71,
+    'C5': 72,
+    'D5': 74,
+    'E5': 76,
+    'F5': 77,
+    'G5': 79
 }
 
-note_mapping_cclef = {
-    'E2': 60,
-    'F2': 60,
-    'G2': 60,
-    'A2': 60,
-    'B2': 60,
-    'C3': 60,
-    'D3': 60,
-    'E3': 60,
-    'F3': 60,
-    'G3': 60,
-    'A3': 60,
-    'B3': 60
-}
+# note_mapping_fclef = {
+#     'E2': 60,
+#     'F2': 60,
+#     'G2': 60,
+#     'A2': 60,
+#     'B2': 60,
+#     'C3': 60,
+#     'D3': 60,
+#     'E3': 60,
+#     'F3': 60,
+#     'G3': 60,
+#     'A3': 60,
+#     'B3': 60
+# }
 
-# Duration according to 120 BPM
+# Duration set to 120 BPM
 duration_mapping = {
-    'Quarter': 480,
-    'Half': 960,
-    'Whole': 1920,
-    'Eigth': 240,
-    'Sixteenth': 120,
-    'Thirty-Two': 60
+    'Quarter-Note': 480,
+    'Half-Note': 960,
+    'Whole-Note': 1920,
+    'Eighth-Note': 240,
+    'Sixteenth-Note': 120,
+    'Thirty-Two-Note': 60,
+    'Sixty-Four-Note': 30
 }
 
 # Get the symbols and octaves string
@@ -82,7 +83,17 @@ with open("symbols.json", 'r') as file:
 
 symbols = data['classification']
 
-print(symbols)
+symbols_string = symbols
+valid_notes = ["Whole_Note",
+                 "Half-Note",
+                 "Quarter-Note",
+                 "Eighth-Note",
+                 "Sixteeth-Note",
+                 "Thirty-Two-Note",
+                 "Sixty-Four-Note"]
+
+notes = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_notes]
+#rests =
 
 # Make sure we have the same number of symbols and octaves
 octave_items = octaves.strip("<>").split(":")
@@ -174,17 +185,29 @@ if key == "UNKNOWN":
 track.append(MetaMessage("key_signature", key=key))
 
 # TODO: finish going through and adding Midi events
+# Initialize the MIDI ticks 
 cumulative_ticks = 0
-for note, duration in zip(octave_items, symbol_items):
-    if note == 'rest':
-        # Skip some length
-        cumulative_ticks += 
-    # Get note, duration from mapping
-    midi_note = 
-    ticks = 
-    track.append(Message('note_on', note=midi_note, velocity=64, time=cumulative_ticks))
-    cumulative_ticks = ticks
-    track.append(Message('note_off', note=midi_note, velocity=64, time=0))
+
+# Process notes and durations
+for note, duration_sym in zip(octave_items, symbol_items):
+    # if note == 'rest':
+    #     # Calculate MIDI tick duration
+    #     ticks = duration_mapping[duration]
+    #     # Skip some length
+    #     cumulative_ticks += ticks
+
+    # Get note and duration from mapping dictionaries 
+    midi_note = note_mapping_gclef.get(note, None)
+    ticks = duration_mapping.get(duration_sym, None)
+
+    # Checks if both notes and duration are valid
+    if midi_note is not None and ticks is not None and duration_sym in valid_notes:
+        print(f"Note: {note}, {duration_sym}")
+        track.append(Message('note_on', note=midi_note, velocity=64, time=0))
+        track.append(Message('note_off', note=midi_note, velocity=64, time=ticks))
+    else: 
+        # print(f"Invalid note or duration: {note}, {duration_sym}")
+        print(f"Not a note: {note}, {duration_sym}")
 
 track.append(MetaMessage('end_of_track'))
 mid.save("piano_track.mid")
