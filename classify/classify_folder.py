@@ -55,12 +55,12 @@ class_labels = {
 }
 
 # Get the model path
-while True:
-    model_path = input("Enter model path: ")
-    if not model_path:
-        print("Invalid input, try again")
-    else:
-        break
+model_path = "model_OMR_CNN_bs16_lr0.003_epoch14"
+if not model_path:
+    print("""Could not locate model path. Please download from 
+        https://drive.google.com/file/d/1T9W8YxLXqoEjPBG-OlK3I2AzZ6LmEII0/view?usp=sharing 
+        and include in classify directory""")
+    sys.exit(1)
 
 model = CNN()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -76,20 +76,10 @@ transform = transforms.Compose([
 ])
 
 # Get the path containing images to classify
-while True:
-    img_dir = input("Enter directory path to be classified: ")
-    if not img_dir or not os.path.isdir(img_dir):
-        print("Invalid input, try again")
-    else:
-        break
+img_dir = "proposal_output"
 
 # Path to write data to
-while True:
-    output_path = input("Enter folder path where output will be stored: ")
-    if not output_path or not os.path.isdir(output_path):
-        print("Invalid input, try again")
-    else:
-        break
+output_path = "../audio"
 
 # Loop through each image in folder and get prediction
 predictions = []

@@ -5,6 +5,7 @@ from left to right
 
 import os
 import json
+import sys
 
 def get_position_from_filename(filename):
     # Returns the (x, y) position from the given file
@@ -19,12 +20,10 @@ def get_position_from_filename(filename):
     return None
 
 # Get the image directory path
-while True:
-    img_dir = input("Enter directory path to be classified: ")
-    if not img_dir or not os.path.isdir(img_dir):
-        print("Invalid input, try again")
-    else:
-        break
+img_dir = "proposal_output"
+if not img_dir or not os.path.isdir(img_dir):
+        print("Could not find region proposal output directory")
+        sys.exit(1)
 
 # Extract positions
 positions = []
