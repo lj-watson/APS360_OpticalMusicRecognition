@@ -6,8 +6,14 @@ from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 import json
 import sys
 
+def get_note(midi):
+    for note, val in note_mapping.items():
+        if val == midi:
+            return note
+    return None
+
 # List of key signatures using Major notation which can also represent natural minors
-sharp_key_signatures = {
+sharp_key_signatures = { # Sharps
     0: "C",
     1: "G",
     2: "D",
@@ -18,7 +24,7 @@ sharp_key_signatures = {
     7: "C#"
 }
 
-flat_key_signatures = {
+flat_key_signatures = { # Flats
     0: "C",
     1: "F",
     2: "Bb",
@@ -29,8 +35,7 @@ flat_key_signatures = {
     7: "Cb"
 }
 
-# Mappings to notes and durations integer equiavelent
-# TODO: fill this in
+# Mappings to notes
 note_mapping = {
     'A0': 21,
     'A#0': 22, 'Bb0': 22,
@@ -122,7 +127,7 @@ note_mapping = {
     'C8': 108
 }
 
-# Duration set to 120 BPM
+# Npote and rest duration set to 120 BPM
 duration_mapping = {
     'Quarter-Note': 480,
     'Quarter-Rest': 480,
@@ -140,12 +145,13 @@ duration_mapping = {
     'Sixty-Four-Rest': 30
 }
 
-# Get the symbols and octaves string
+# Get the octaves string
 with open("octaves.json", 'r') as file:
     data = json.load(file)
 
 octaves = data['octaves']
 
+# Get the symbols string
 with open("symbols.json", 'r') as file:
     data = json.load(file)
 
@@ -172,6 +178,10 @@ valid_rests = ["Whole_Rest",
                "Thirty-Two-Rest",
                "Sixty-Four-Rest"]
 
+valid_accidentals = ["Sharp",
+                     "Flat",
+                     "Natural"]
+
 # List of all valid notes and rests respectively 
 notes = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_notes]
 rests = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_rests]
@@ -185,6 +195,7 @@ if len(octave_items) != len(symbol_items):
     print("Error: number of symbols and octaves do not match!")
     sys.exit()
 
+# Midi file setup
 mid = MidiFile()
 track = MidiTrack()
 mid.tracks.append(track)
@@ -296,7 +307,7 @@ elif key == "Cb":
 
 # Makes the adjustment for all key signatures other than C-Major or A-minor
 pitch_items = []
-if key is not "C":
+if key != "C":
     for note in octave_items:
         root_note = note[0]
         if root_note in adjustments:
@@ -310,27 +321,51 @@ else:
 # Finally append key
 track.append(MetaMessage("key_signature", key=key))
 
-# TODO: finish going through and adding Midi events
 # Initialize the MIDI ticks 
-cumulative_ticks = 0
+# cumulative_ticks = 0
+
+# Initialize accidental checker
+accidental_check = False
+accidental = ""
 
 # Process notes, rests, and durations
-for note, duration_sym in zip(pitch_items, symbol_items):
+for pitch, symbol in zip(pitch_items, symbol_items):
     # Get note and duration from mapping dictionaries         
-    midi_note = note_mapping.get(note, None)
-    ticks = duration_mapping.get(duration_sym, None)
+    midi_note = note_mapping.get(pitch, None)
+    ticks = duration_mapping.get(symbol, None)
 
     # Checks if both notes and duration are valid
-    if midi_note is not None and ticks is not None and duration_sym in valid_notes:
+    if midi_note is not None and ticks is not None and symbol in valid_notes:
+        # Changes pitch for accidentals
+        if accidental_check:
+            if accidental == "Sharp":
+                midi_note += 1
+            elif accidental == "Flat":
+                midi_note -= 1
+            elif accidental == "Natural":
+                if '#' in pitch: # Moves sharp notes down a semitone
+                    midi_note -= 1
+                elif 'b' in pitch: # Moves flat notes up a semitone
+                    midi_note += 1
+                    
+            print(f"{accidental} found, pitch changed from {pitch} to {get_note(midi_note)}")
+            pitch = get_note(midi_note)
+            
         track.append(Message('note_on', note=midi_note, velocity=64, time=0))
         track.append(Message('note_off', note=midi_note, velocity=64, time=ticks))
-        print(f"Note: {note}, {duration_sym}")
-    elif duration_sym in valid_rests:
+        print(f"Note: {pitch}, {symbol}")
+        accidental_check = False
+    elif symbol in valid_rests:
         track.append(Message('note_off', note=0, velocity=0, time=ticks))
-        print(f"Rest: {duration_sym}")
-    else: 
-        # print(f"Invalid note or duration: {note}, {duration_sym}")
-        print(f"Not a note: {note}, {duration_sym}")
+        print(f"Rest: {symbol}")
+        accidental_check = False
+    else:
+        if accidental_check:
+            accidental_check = False
+        if symbol in valid_accidentals:
+            accidental_check = True
+            accidental = symbol
+        print(f"Not a note: {pitch}, {symbol}")
 
 track.append(MetaMessage('end_of_track'))
 mid.save("score.mid")
