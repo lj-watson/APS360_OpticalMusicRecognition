@@ -13,8 +13,8 @@ def get_position_from_filename(filename):
     name, ext = os.path.splitext(base)  # Separates the extension
     if "_" in name and ext == ".png":
         try:
-            x, y = map(int, name.split("_"))
-            return x, y
+            x, y, w, h = map(int, name.split("_"))
+            return x, y, h
         except ValueError:
             pass
     return None
@@ -35,14 +35,16 @@ for filename in os.listdir(img_dir):
 # Sort images based on the x position
 positions.sort()
 
-# Rearrange the directory
+# Rearrange and rename files in the directory
 y_values = []
-for i, ((x, y), filename) in enumerate(positions, 1):
+h_values = []
+for i, ((x, y, h), filename) in enumerate(positions, 1):
     new_name = f"{i:03d}.png"
     old_path = os.path.join(img_dir, filename)
     new_path = os.path.join(img_dir, new_name)
     os.rename(old_path, new_path)
     y_values.append(y)
+    h_values.append(h)
 
 # Write y values to json file
 filename = 'symbol_y_values.json'
@@ -50,3 +52,7 @@ output_path = "../audio"
 json_path = f'{output_path}/{filename}'
 with open(json_path, 'w') as file:
     json.dump(y_values, file)
+filename = 'symbol_h_values.json'
+json_path = f'{output_path}/{filename}'
+with open(json_path, 'w') as file:
+    json.dump(h_values, file)

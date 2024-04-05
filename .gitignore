@@ -9,7 +9,8 @@ __pycache__/
 
 # C extensions
 *.so
-
+classify/model_OMR_CNN_bs16_lr0.003_epoch14
+release
 # Distribution / packaging
 .Python
 build/
