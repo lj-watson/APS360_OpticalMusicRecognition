@@ -6,9 +6,10 @@ from mido import MidiFile, MidiTrack, Message, MetaMessage, bpm2tempo
 import json
 import sys
 
+# Gets the actual note/pitch from the MIDI value
 def get_note(midi):
-    for note, val in note_mapping.items():
-        if val == midi:
+    for note, value in note_mapping.items():
+        if value == midi:
             return note
     return None
 
@@ -38,7 +39,7 @@ flat_key_signatures = { # Flats
 # Mappings to notes
 note_mapping = {
     'A0': 21,
-    'A#0': 22, 'Bb0': 22,
+    'A#0': 22, 'Bb0': 22, # Some pitches can be notated in two different ways
     'B0': 23,
     'C1': 24,
     'C#1': 25, 'Db1': 25,
@@ -148,13 +149,11 @@ duration_mapping = {
 # Get the octaves string
 with open("octaves.json", 'r') as file:
     data = json.load(file)
-
 octaves = data['octaves']
 
 # Get the symbols string
 with open("symbols.json", 'r') as file:
     data = json.load(file)
-
 symbols = data['classification']
 
 # Sets a temporary list of symbols 
@@ -178,9 +177,18 @@ valid_rests = ["Whole_Rest",
                "Thirty-Two-Rest",
                "Sixty-Four-Rest"]
 
+# Dictionary of all valid accidentals
 valid_accidentals = ["Sharp",
                      "Flat",
                      "Natural"]
+
+# Dictionary of all valid virtuoso notations
+valid_virtuosos = ["Accent",
+                   "Dot",
+                   "Fermata",
+                   "Marcato",
+                   "Mordent",
+                   "Tenuto"]
 
 # List of all valid notes and rests respectively 
 notes = [symbol.split(":")[0] for symbol in symbols_string.strip("<>").split(":") if symbol.split(":")[0] in valid_notes]
@@ -195,14 +203,14 @@ if len(octave_items) != len(symbol_items):
     print("Error: number of symbols and octaves do not match!")
     sys.exit()
 
-# Midi file setup
+# MIDI file setup
 mid = MidiFile()
 track = MidiTrack()
 mid.tracks.append(track)
 
 # Set to grand piano
 track.append(Message('program_change', program=0))
-# Set default tempo
+# Set default tempo to 120 BPM
 track.append(MetaMessage('set_tempo', tempo=bpm2tempo(120)))
 
 # Get time signature
@@ -233,10 +241,6 @@ for indx, symbol in enumerate(symbol_items):
 time_sig_parts = time_sig.split("-")
 track.append(MetaMessage('time_signature', numerator=int(time_sig_parts[0]), denominator=int(time_sig_parts[1])))
 
-# Get key from all the accidentals before the time signature
-# In case of errors we assume the key to be C major
-
-
 # Check if we have a clef element, if not assume G clef
 clef = 'G-Clef'
 clef_indx = -1
@@ -259,17 +263,17 @@ if key_starting >= key_stopping:
     print("Error: time signature appears before clef")
     sys.exit()
 
-# TODO: improve this instead of counting number of flats/sharps
 # Count the number of flats or sharps appearing
-# If there are both flats and sharps then just assume the key to be C major
 num_sharps = symbol_items[key_starting:key_stopping].count('Sharp')
 num_flats = symbol_items[key_starting:key_stopping].count('Flat')
 
+# Gets the number of sharps or flats using their dictionaries 
 if num_sharps == 0:
     key = flat_key_signatures.get(num_flats, "UNKNOWN")
 else:
     key = sharp_key_signatures.get(num_sharps, "UNKNOWN")
 
+# If there are both flats and sharps then just assume the key to be C major
 if key == "UNKNOWN":
     print("Warning: Too many sharps/flats! Setting key signature to C")
     key = "C"
@@ -308,28 +312,34 @@ elif key == "Cb":
 # Makes the adjustment for all key signatures other than C-Major or A-minor
 pitch_items = []
 if key != "C":
+    # Loops through all the octave items
     for note in octave_items:
+        # Finds the respective notes and replaces it for the correct corresponding sharp or flat
         root_note = note[0]
         if root_note in adjustments:
             adjusted_note = adjustments[root_note] + note[1:]
         else:
             adjusted_note = note
         pitch_items.append(adjusted_note)
+# Keep pitch as C-Major or A-minor
 else:
     pitch_items = octave_items
 
 # Finally append key
 track.append(MetaMessage("key_signature", key=key))
 
-# Initialize the MIDI ticks 
-# cumulative_ticks = 0
-
-# Initialize accidental checker
+# Initialize accidental and virtuoso notations checker
 accidental_check = False
+virtuoso_check = False
 accidental = ""
+virtuoso_notation = ""
 
 # Process notes, rests, and durations
 for pitch, symbol in zip(pitch_items, symbol_items):
+    # Initialize timing and volume variables
+    velocity = 64
+    pause_in_music = 0
+    
     # Get note and duration from mapping dictionaries         
     midi_note = note_mapping.get(pitch, None)
     ticks = duration_mapping.get(symbol, None)
@@ -349,23 +359,76 @@ for pitch, symbol in zip(pitch_items, symbol_items):
                     midi_note += 1
                     
             print(f"{accidental} found, pitch changed from {pitch} to {get_note(midi_note)}")
-            pitch = get_note(midi_note)
+            pitch = get_note(midi_note) # Changes pitch value so the print statement is updated
             
-        track.append(Message('note_on', note=midi_note, velocity=64, time=0))
-        track.append(Message('note_off', note=midi_note, velocity=64, time=ticks))
+        # Applies any timing or dynamics to the pitch and volume of the notes
+        if virtuoso_check:
+            if virtuoso_notation == "Accent":
+                velocity += 30
+            elif virtuoso_notation == "Dot":
+                pause_in_music = ticks - 20
+                ticks = 20
+            elif virtuoso_notation == "Fermata":
+                ticks *= 2
+                pause_in_music = ticks
+            elif virtuoso_notation == "Marcato":
+                velocity += 45
+            elif virtuoso_notation == "Mordent":
+                # Set the initial length of the note
+                initial_ticks = ticks
+                # Calculates the subdivision for upper note
+                upper_note_ticks = int(initial_ticks / 4)
+                track.append(Message('note_on', note=midi_note, velocity=velocity, time=0))
+                track.append(Message('note_off', note=midi_note, velocity=velocity, time=upper_note_ticks))
+                track.append(Message('note_on', note=midi_note+2, velocity=velocity, time=0))
+                track.append(Message('note_off', note=midi_note+2, velocity=velocity, time=upper_note_ticks))
+                # Reset the timing for the principal note
+                ticks = int(initial_ticks / 2)
+            elif virtuoso_notation == "Tenuto":
+                velocity += 10
+            
+            print(f"{virtuoso_notation} applied")
+        
+        # Appends each note to the MIDI track
+        track.append(Message('note_on', note=midi_note, velocity=velocity, time=0))
+        track.append(Message('note_off', note=midi_note, velocity=velocity, time=ticks))
+        
+        # Fills the rest of the note after a staccato or puase after fermata
+        if pause_in_music != 0:
+            track.append(Message('note_off', note=midi_note, velocity=velocity, time=pause_in_music))
+        
+        # Prints the note and resets booleans
         print(f"Note: {pitch}, {symbol}")
         accidental_check = False
+        virtuoso_check = False
+    
+    # Checks and appends rests to the MIDI track
     elif symbol in valid_rests:
         track.append(Message('note_off', note=0, velocity=0, time=ticks))
         print(f"Rest: {symbol}")
         accidental_check = False
+        virtuoso_check = False
+    
+    # Setting symbols and pitches if not either notes or rests
     else:
+        # Reverts the accidental checker back to false in the case of two back to back non-note/rests
         if accidental_check:
             accidental_check = False
+        # Checks if the symbol is an accidental
         if symbol in valid_accidentals:
             accidental_check = True
             accidental = symbol
-        print(f"Not a note: {pitch}, {symbol}")
+        
+        # Reverts the virtuoso checker back to false in the case of two back to back non-note/rests
+        if virtuoso_check:
+            virtuoso_check = False
+        # Checks if the symbol is any of the virtuoso notations 
+        if symbol in valid_virtuosos:
+            virtuoso_check = True
+            virtuoso_notation = symbol
+        
+        print(f"Not a note or rest: {pitch}, {symbol}")
 
+# Appends the end of track metadata and saves the MIDI file
 track.append(MetaMessage('end_of_track'))
 mid.save("score.mid")
