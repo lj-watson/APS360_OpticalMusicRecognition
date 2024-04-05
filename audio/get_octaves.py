@@ -127,7 +127,7 @@ for index, pos in enumerate(symbol_y_data):
 # Write symbol octaves to json file
 text_string = ':'.join(symbol_octaves)
 text_string = f'<{text_string}>'
-data = {"octaves": symbol_octaves}
+data = {"octaves": text_string}
 filename = 'octaves.json'
 with open(filename, 'w') as file:
     json.dump(data, file)
