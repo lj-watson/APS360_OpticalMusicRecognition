@@ -3,7 +3,7 @@
 '''
 
 import json
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 import numpy as np
 
@@ -49,14 +49,29 @@ for i in range(1, len(octave_data)):
 average_distance = total_distance / (len(octave_data) - 1)
 # Since this is the average distance between each line, divide by 2
 average_distance = average_distance / 2
-print(average_distance)
+
 # Fill array of all octave locations
 octave_values = []
 top = octave_data[0]
 octave_values.append(top - average_distance)
 for i in range(11):
     octave_values.append(top+(average_distance*i))
-print(octave_values)
+
+# Load the image
+img = Image.open("../release/input.png")
+draw = ImageDraw.Draw(img)
+    
+# Highlight color and line width
+highlight_color = "red"
+line_width = 2
+
+# Draw a line across the width of the image at each y-value
+for staff in octave_values:
+    draw.line([(0, staff), (img.width, staff)], fill=highlight_color, width=line_width)
+
+# Save the modified image
+img.save("staff_lines_location_updated.png")
+
 # Find out if we are in treble clef or base clef
 with open("symbols.json", 'r') as file:
     symbol_data = json.load(file)
@@ -120,9 +135,15 @@ for index, pos in enumerate(symbol_y_data):
         pos = pos - symbol_h_data[index]
     closest_index = min(range(len(octave_values)), key=lambda x: abs(octave_values[x]-pos))
     if clef == 'G-Clef':
-        symbol_octaves.append(index_mapping_gclef[closest_index])
+        if index_mapping_gclef[closest_index] == 'C4' or index_mapping_gclef[closest_index] == 'G5':
+            symbol_octaves.append(index_mapping_gclef[closest_index])
+        else:
+            symbol_octaves.append(index_mapping_gclef[closest_index-1])
     else:
-        symbol_octaves.append(index_mapping_cclef[closest_index])
+        if index_mapping_gclef[closest_index] == 'E2' or index_mapping_gclef[closest_index] == 'B4':
+            symbol_octaves.append(index_mapping_cclef[closest_index])
+        else:
+            symbol_octaves.append(index_mapping_cclef[closest_index-1])
 
 # Write symbol octaves to json file
 text_string = ':'.join(symbol_octaves)
