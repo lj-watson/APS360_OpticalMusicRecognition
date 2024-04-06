@@ -18,6 +18,7 @@ def run_script(path):
 
 run_script('../classify/staff_removal.py')
 run_script('../classify/region_proposal.py')
+run_script('../classify/get_staff_y_values.py')
 run_script('../classify/clean_input.py')
 run_script('../classify/classify_folder.py')
 run_script('../audio/get_octaves.py')
