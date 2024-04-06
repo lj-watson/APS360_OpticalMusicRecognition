@@ -339,6 +339,8 @@ print("Clef:", clef)
 print("Key:", key)
 print("Time Signature:", time_sig)
 
+counter = 0
+
 # Process notes, rests, and durations
 for pitch, symbol in zip(pitch_items, symbol_items):
     # Initialize timing and volume variables
@@ -433,6 +435,10 @@ for pitch, symbol in zip(pitch_items, symbol_items):
             virtuoso_notation = symbol
         
         print(f"Not a note or rest: {pitch}, {symbol}")
+
+    counter += 1
+
+print("Total Symbols:", counter)
 
 # Appends the end of track metadata and saves the MIDI file
 track.append(MetaMessage('end_of_track'))
