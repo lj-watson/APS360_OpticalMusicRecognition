@@ -133,17 +133,29 @@ for index, pos in enumerate(symbol_y_data):
     # Need to check for upside down note
     if index in upsidedown_list:
         pos = pos - symbol_h_data[index]
-    closest_index = min(range(len(octave_values)), key=lambda x: abs(octave_values[x]-pos))
-    if clef == 'G-Clef':
-        if index_mapping_gclef[closest_index] == 'C4' or index_mapping_gclef[closest_index] == 'G5':
-            symbol_octaves.append(index_mapping_gclef[closest_index])
+        closest_index = min(range(len(octave_values)), key=lambda x: abs(octave_values[x]-pos))
+        if clef == 'G-Clef':
+            if pos > max(octave_values) or pos < min(octave_values):
+                symbol_octaves.append(index_mapping_gclef[closest_index])
+            else:
+                symbol_octaves.append(index_mapping_gclef[closest_index+1])
         else:
-            symbol_octaves.append(index_mapping_gclef[closest_index-1])
+            if pos > max(octave_values) or pos < min(octave_values):
+                symbol_octaves.append(index_mapping_cclef[closest_index])
+            else:
+                symbol_octaves.append(index_mapping_cclef[closest_index+1])
     else:
-        if index_mapping_gclef[closest_index] == 'E2' or index_mapping_gclef[closest_index] == 'B4':
-            symbol_octaves.append(index_mapping_cclef[closest_index])
+        closest_index = min(range(len(octave_values)), key=lambda x: abs(octave_values[x]-pos))
+        if clef == 'G-Clef':
+            if index_mapping_gclef[closest_index] == 'C4' or index_mapping_gclef[closest_index] == 'G5':
+                symbol_octaves.append(index_mapping_gclef[closest_index])
+            else:
+                symbol_octaves.append(index_mapping_gclef[closest_index-1])
         else:
-            symbol_octaves.append(index_mapping_cclef[closest_index-1])
+            if index_mapping_gclef[closest_index] == 'E2' or index_mapping_gclef[closest_index] == 'B4':
+                symbol_octaves.append(index_mapping_cclef[closest_index])
+            else:
+                symbol_octaves.append(index_mapping_cclef[closest_index-1])
 
 # Write symbol octaves to json file
 text_string = ':'.join(symbol_octaves)
