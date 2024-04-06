@@ -334,6 +334,11 @@ virtuoso_check = False
 accidental = ""
 virtuoso_notation = ""
 
+# Print score setup 
+print("Clef:", clef)
+print("Key:", key)
+print("Time Signature:", time_sig)
+
 # Process notes, rests, and durations
 for pitch, symbol in zip(pitch_items, symbol_items):
     # Initialize timing and volume variables
