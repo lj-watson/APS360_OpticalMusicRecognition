@@ -8,6 +8,8 @@ import PIL
 from PIL import Image as PILImage
 import os
 import shutil
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 def nostaff_to_regions(nostaff):
     '''
@@ -51,6 +53,19 @@ def nostaff_to_regions(nostaff):
     for item in to_remove:
         if item in candidates:
             candidates.remove(item)
+
+    # draw rectangles on the original image
+    fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 10))
+    ax.imshow(img_no_alpha)
+    for x, y, w, h in candidates:
+        #print(x, y, w, h)
+        rect = mpatches.Rectangle(
+            (x, y), w, h, fill=False, edgecolor='red', linewidth=1)
+        ax.add_patch(rect)
+    plt.savefig("region_proposals.png")
+    plt.close(fig)
+
+    return candidates, img_no_alpha
 
     return candidates, img_no_alpha
 
