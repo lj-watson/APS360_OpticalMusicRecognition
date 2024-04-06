@@ -220,8 +220,12 @@ time_sig = "4-4-Time"
 time_indx = -1
 for indx, symbol in enumerate(symbol_items):
     if "Time" in symbol:
-        time_indx = indx
-        time_sig = symbol
+        if "Cut" in symbol:
+            time_indx = indx
+            time_sig = "2-2-Time"
+        else:
+            time_indx = indx
+            time_sig = symbol
         break
 
 first_note_indx = -1;
