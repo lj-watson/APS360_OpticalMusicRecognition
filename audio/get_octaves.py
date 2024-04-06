@@ -147,12 +147,12 @@ for index, pos in enumerate(symbol_y_data):
     else:
         closest_index = min(range(len(octave_values)), key=lambda x: abs(octave_values[x]-pos))
         if clef == 'G-Clef':
-            if index_mapping_gclef[closest_index] == 'C4' or index_mapping_gclef[closest_index] == 'G5':
+            if  pos > max(octave_values) or pos < min(octave_values):
                 symbol_octaves.append(index_mapping_gclef[closest_index])
             else:
                 symbol_octaves.append(index_mapping_gclef[closest_index-1])
         else:
-            if index_mapping_gclef[closest_index] == 'E2' or index_mapping_gclef[closest_index] == 'B4':
+            if  pos > max(octave_values) or pos < min(octave_values)':
                 symbol_octaves.append(index_mapping_cclef[closest_index])
             else:
                 symbol_octaves.append(index_mapping_cclef[closest_index-1])
