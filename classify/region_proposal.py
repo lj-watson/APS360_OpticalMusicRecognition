@@ -19,7 +19,7 @@ def nostaff_to_regions(nostaff):
     img_no_alpha = nostaff#[:,:,:3]
     # applying selective search
     img_lbl, regions = selectivesearch.selective_search(
-        img_no_alpha,scale=10000, sigma=0, min_size=200)
+        img_no_alpha,scale=10000, sigma=0, min_size=100)
 
     candidates = set()
     for r in regions:
