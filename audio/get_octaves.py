@@ -152,7 +152,7 @@ for index, pos in enumerate(symbol_y_data):
             else:
                 symbol_octaves.append(index_mapping_gclef[closest_index-1])
         else:
-            if  pos > max(octave_values) or pos < min(octave_values)':
+            if  pos > max(octave_values) or pos < min(octave_values):
                 symbol_octaves.append(index_mapping_cclef[closest_index])
             else:
                 symbol_octaves.append(index_mapping_cclef[closest_index-1])
