@@ -49,14 +49,14 @@ for i in range(1, len(octave_data)):
 average_distance = total_distance / (len(octave_data) - 1)
 # Since this is the average distance between each line, divide by 2
 average_distance = average_distance / 2
-
+print(average_distance)
 # Fill array of all octave locations
 octave_values = []
 top = octave_data[0]
 octave_values.append(top - average_distance)
 for i in range(11):
     octave_values.append(top+(average_distance*i))
-
+print(octave_values)
 # Find out if we are in treble clef or base clef
 with open("symbols.json", 'r') as file:
     symbol_data = json.load(file)

@@ -166,12 +166,5 @@ image_np = np.array(image)
 
 res, staff_coords = staffline_removal_and_coords(image_np)
 
-# Write staff coords to json file
-filename = 'octave_y_values.json'
-output_path = "../audio"
-json_path = f'{output_path}/{filename}'
-with open(json_path, 'w') as file:
-    json.dump(staff_coords, file)
-
 # Save new image
 cv2.imwrite('new_image.png', res)
