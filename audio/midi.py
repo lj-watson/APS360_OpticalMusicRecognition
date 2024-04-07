@@ -164,7 +164,7 @@ valid_notes = ["Whole_Note",
                  "Half-Note",
                  "Quarter-Note",
                  "Eighth-Note",
-                 "Sixteeth-Note",
+                 "Sixteenth-Note",
                  "Thirty-Two-Note",
                  "Sixty-Four-Note"]
 
@@ -173,7 +173,7 @@ valid_rests = ["Whole_Rest",
                "Half-Rest",
                "Quarter-Rest",
                "Eighth-Rest",
-               "Sixteeth-Rest",
+               "Sixteenth-Rest",
                "Thirty-Two-Rest",
                "Sixty-Four-Rest"]
 
@@ -264,8 +264,8 @@ key_starting = clef_indx
 if clef_indx == -1:
     key_starting == 0
 if key_starting >= key_stopping:
-    print("Error: time signature appears before clef")
-    sys.exit()
+    print("Warning: time signature appears before clef")
+    # sys.exit()
 
 # Count the number of flats or sharps appearing
 num_sharps = symbol_items[key_starting:key_stopping].count('Sharp')
@@ -343,7 +343,9 @@ print("Clef:", clef)
 print("Key:", key)
 print("Time Signature:", time_sig)
 
+# Symbols and notes counter
 counter = 0
+num_notes = 0
 
 # Process notes, rests, and durations
 for pitch, symbol in zip(pitch_items, symbol_items):
@@ -412,6 +414,7 @@ for pitch, symbol in zip(pitch_items, symbol_items):
         print(f"Note: {pitch}, {symbol}")
         accidental_check = False
         virtuoso_check = False
+        num_notes += 1
     
     # Checks and appends rests to the MIDI track
     elif symbol in valid_rests:
@@ -442,6 +445,8 @@ for pitch, symbol in zip(pitch_items, symbol_items):
 
     counter += 1
 
+# Prints the total number of region proposed symbols and classified notes
+print("Total Notes:", num_notes)
 print("Total Symbols:", counter)
 
 # Appends the end of track metadata and saves the MIDI file
