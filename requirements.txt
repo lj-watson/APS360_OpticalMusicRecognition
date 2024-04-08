@@ -11,5 +11,4 @@ keras
 Keras-Preprocessing
 opencv-python
 mido
-opencv-python
 selectivesearch
