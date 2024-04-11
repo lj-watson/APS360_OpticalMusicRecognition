@@ -33,8 +33,8 @@ Staff lines reconstructed
 Pitch lines found
 ![pitch_lines](https://github.com/lj-watson/APS360_OpticalMusicRecognition/blob/master/example/pitch_lines.png)
 
-Model output and pitch algorithm output:
-"<G-Clef:Sharp:Sharp:4-4-Time:Quarter-Rest:Quarter-Note:Eighth-Note:Eighth-Note:Sharp:Eighth-Note:Eighth-Note:Quarter-Rest:Quarter-Note:Quarter-Rest:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Quarter-Note:Quarter-Rest:Quarter-Note:Quarter-Rest:Quarter-Note:Quarter-Rest>
-"<C4:D5:A4:F4:G4:A4:F4:A4:E4:G4:C4:G4:C5:G4:A4:F4:E4:D4:A4:A4:A4:G4:F4:G4:A4:G4>"
-
+Model output and pitch algorithm output:  
+`G-Clef:Sharp:Sharp:4-4-Time:Quarter-Rest:Quarter-Note:Eighth-Note:Eighth-Note:Sharp:Eighth-Note:Eighth-Note:Quarter-Rest:Quarter-Note:Quarter-Rest:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Eighth-Note:Quarter-Note:Quarter-Rest:Quarter-Note:Quarter-Rest:Quarter-Note:Quarter-Rest`  
+`C4:D5:A4:F4:G4:A4:F4:A4:E4:G4:C4:G4:C5:G4:A4:F4:E4:D4:A4:A4:A4:G4:F4:G4:A4:G4`  
+  
 MIDI file generated from this data can be found in 'example/score.mid'!
