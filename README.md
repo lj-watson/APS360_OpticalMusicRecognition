@@ -18,4 +18,4 @@ The input image is fed through a staff line removal file, which replaces the bla
 
 ## Example
 
-![input][https://github.com/lj-watson/APS360_OpticalMusicRecognition/blob/master/example/input.png]
+![input](https://github.com/lj-watson/APS360_OpticalMusicRecognition/blob/master/example/input.png)
