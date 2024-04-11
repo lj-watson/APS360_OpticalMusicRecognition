@@ -2,12 +2,15 @@
 
 ## Description
 
-This project uses multiple alogirthms and a deep learning model to transform digital printed sheet music into audio format.
+This project uses multiple alogirthms and a deep learning model to transform one line digital printed sheet music into audio format.
 
 ## Requirements
 
-All required libraries can be installed using pip: `pip install -r requirements.txt`
+All libraries are in requirements.txt: `pip install -r requirements.txt`
 
 ## Running
 
-Drop the score in png format into the 'release' folder, naming it input.png. Then execute the program using `python runner.py`
+Drop the score in png format into 'release' folder, naming it input.png. Execute the program using `python runner.py`. MIDI file will appear in 'audio' folder.
+
+## Method
+
