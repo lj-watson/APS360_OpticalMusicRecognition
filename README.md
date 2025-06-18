@@ -2,7 +2,7 @@
 
 ## Description
 
-This project uses multiple alogirthms and a deep learning model to transform one line digital printed sheet music into audio format.
+This project uses multiple alogirthms and a deep learning model to transform digital printed sheet music into audio format.
 
 ## Requirements
 
